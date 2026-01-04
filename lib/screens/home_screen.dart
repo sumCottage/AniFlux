@@ -503,6 +503,9 @@ class MyAnimeList extends StatelessWidget {
   final String status;
   final bool isGridView;
 
+  // Static map to track timers for debouncing Planning -> Watching transition
+  static final Map<String, Timer> _planningTimers = {};
+
   const MyAnimeList({super.key, required this.status, this.isGridView = false});
 
   @override
@@ -778,34 +781,83 @@ class MyAnimeList extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 subtitle: Text("Ep: $progress / $totalEpisodes"),
-                trailing: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.star_rounded,
-                        size: 16,
-                        color: Colors.amber,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        "$rating",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.amber,
+                trailing: status == 'Completed'
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
                         ),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              size: 16,
+                              color: Colors.amber,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              "$rating",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amber,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : IconButton(
+                        onPressed: () async {
+                          final currentProgress =
+                              (data['progress'] ?? 0) as int;
+                          final totalEp = data['totalEpisodes'];
+                          final docId = doc.id;
+
+                          // Check if we can increment
+                          if (totalEp is int && currentProgress >= totalEp) {
+                            return;
+                          }
+
+                          // Increment progress immediately
+                          await doc.reference.update({
+                            'progress': currentProgress + 1,
+                          });
+
+                          // For Planning: debounce the status change
+                          // Allow user to click multiple times, only move to Watching
+                          // after 3 seconds of inactivity
+                          if (status == 'Planning') {
+                            // Cancel any existing timer for this anime
+                            _planningTimers[docId]?.cancel();
+
+                            // Start a new timer
+                            _planningTimers[docId] = Timer(
+                              const Duration(seconds: 3),
+                              () async {
+                                // Move to Watching after 3 seconds of no clicks
+                                await doc.reference.update({
+                                  'status': 'Watching',
+                                });
+                                // Clean up timer reference
+                                _planningTimers.remove(docId);
+                              },
+                            );
+                          }
+                        },
+                        style: IconButton.styleFrom(
+                          backgroundColor: const Color(
+                            0xFF8A5CF6,
+                          ), // Primary purple
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.all(4),
+                          minimumSize: const Size(32, 32),
+                        ),
+                        icon: const Icon(Icons.add, size: 20),
                       ),
-                    ],
-                  ),
-                ),
               ),
             );
           },
