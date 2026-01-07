@@ -1,3 +1,4 @@
+import 'package:ainme_vault/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,118 +14,149 @@ class AccountSettingsBottomSheet extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F3FF),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.grey,
-                ),
-                Text(
-                  "Account Settings",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontSize: 18),
-                ),
-                const SizedBox(width: 48), // Balance the close button
-              ],
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag Handle
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.black26,
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-          ),
 
-          const Divider(height: 1),
+            const SizedBox(height: 12),
 
-          // Content
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Current Email Section
-                _buildSectionLabel("Current Email"),
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                    color: Colors.black54,
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.email_outlined,
-                        color: AppTheme.primary,
-                        size: 22,
+                  const Expanded(
+                    child: Text(
+                      "Account Settings",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          user?.email ?? "No email",
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(width: 48),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Main Card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionLabel("Current Email"),
+                    const SizedBox(height: 10),
+                    _infoTile(
+                      icon: Icons.email_outlined,
+                      value: user?.email ?? "No email",
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    _sectionLabel("Integrations"),
+                    const SizedBox(height: 10),
+                    _actionTile(
+                      icon: Icons.link,
+                      title: "Login with AniList",
+                      subtitle: "Sync your anime list",
+                      iconColor: const Color(0xFF02A9FF),
+                      onTap: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("AniList integration coming soon!"),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    _sectionLabel("Danger Zone"),
+                    const SizedBox(height: 10),
+                    _dangerTile(context),
+                  ],
                 ),
+              ),
+            ),
 
-                const SizedBox(height: 28),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
 
-                // AniList Integration
-                _buildSectionLabel("Integrations"),
-                const SizedBox(height: 12),
-                _buildOptionTile(
-                  context,
-                  icon: Icons.link,
-                  title: "Login with AniList",
-                  subtitle: "Sync your anime list",
-                  iconColor: const Color(0xFF02A9FF),
-                  onTap: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('AniList integration coming soon!'),
-                        backgroundColor: Color(0xFF02A9FF),
-                      ),
-                    );
-                  },
-                ),
+  // ------------------ Helpers ------------------
 
-                const SizedBox(height: 28),
+  Widget _sectionLabel(String label) {
+    return Text(
+      label.toUpperCase(),
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+        color: Colors.black54,
+        letterSpacing: 0.6,
+      ),
+    );
+  }
 
-                // Danger Zone
-                _buildSectionLabel("Danger Zone"),
-                const SizedBox(height: 12),
-                _buildOptionTile(
-                  context,
-                  icon: Icons.delete_forever,
-                  title: "Delete Account",
-                  subtitle: "Permanently delete your account and data",
-                  iconColor: Colors.red,
-                  isDestructive: true,
-                  onTap: () => _showDeleteConfirmation(context),
-                ),
-
-                const SizedBox(height: 16),
-              ],
+  Widget _infoTile({required IconData icon, required String value}) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          _iconCircle(icon, AppTheme.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -132,86 +164,194 @@ class AccountSettingsBottomSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionLabel(String label) {
-    return Text(
-      label,
-      style: TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.bold,
-        color: Colors.grey.shade600,
-        letterSpacing: 0.5,
-      ),
-    );
-  }
-
-  Widget _buildOptionTile(
-    BuildContext context, {
+  Widget _actionTile({
     required IconData icon,
     required String title,
     required String subtitle,
     required Color iconColor,
     required VoidCallback onTap,
-    bool isDestructive = false,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDestructive
-                ? Colors.red.withOpacity(0.05)
-                : Colors.grey.shade50,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDestructive
-                  ? Colors.red.withOpacity(0.2)
-                  : Colors.grey.shade200,
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            _iconCircle(icon, iconColor),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                  ),
+                ],
+              ),
             ),
-          ),
-          child: Row(
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Colors.black26,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _dangerTile(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: () => _showDeleteConfirmation(context),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.red.withOpacity(0.25)),
+        ),
+        child: Row(
+          children: [
+            _iconCircle(Icons.delete_forever, Colors.red),
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Text(
+                "Delete Account",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.red.shade300),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _iconCircle(IconData icon, Color color) {
+    return Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.15),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, color: color, size: 22),
+    );
+  }
+
+  // Delete dialog
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
+              // Icon
               Container(
-                width: 42,
-                height: 42,
+                width: 60,
+                height: 60,
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.1),
+                  color: Colors.red.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: iconColor, size: 22),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: isDestructive ? Colors.red : Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade500,
-                      ),
-                    ),
-                  ],
+                child: const Icon(
+                  Icons.delete_forever,
+                  color: Colors.red,
+                  size: 32,
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: isDestructive
-                    ? Colors.red.shade300
-                    : Colors.grey.shade400,
+
+              const SizedBox(height: 16),
+
+              const Text(
+                "Delete Account",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+              ),
+
+              const SizedBox(height: 10),
+
+              const Text(
+                "This action cannot be undone.\nAll your data will be permanently lost.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.4,
+                  color: Colors.black54,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.black38, width: 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final user = FirebaseAuth.instance.currentUser;
+
+                        // ✅ Capture a SAFE context BEFORE popping
+                        final rootContext = Navigator.of(
+                          context,
+                          rootNavigator: true,
+                        ).context;
+
+                        Navigator.pop(context); // close dialog
+
+                        if (user != null) {
+                          await _deleteAccountWithUser(rootContext, user);
+                        }
+                      },
+
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: const Text("Delete"),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -220,99 +360,184 @@ class AccountSettingsBottomSheet extends StatelessWidget {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
-            SizedBox(width: 10),
-            Text('Delete Account'),
-          ],
-        ),
-        content: const Text(
-          'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently lost.',
-          style: TextStyle(height: 1.5),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context); // Close dialog
-              Navigator.pop(context); // Close bottom sheet
-              await _deleteAccount(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _deleteAccount(BuildContext context) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+  Future<void> _deleteAccountWithUser(BuildContext context, User user) async {
+    final uid = user.uid;
 
     try {
-      // Delete user data from Firestore
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .delete();
+      debugPrint("🔥 Attempting account deletion");
 
-      // Delete anime subcollection
-      final animeCollection = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('anime')
-          .get();
+      // ✅ 1. Delete Firestore data FIRST
+      await _deleteUserFirestoreDataByUid(uid);
 
-      for (var doc in animeCollection.docs) {
-        await doc.reference.delete();
-      }
+      // ✅ 2. Delete auth user
+      await user.delete();
 
-      // Clear local data
+      debugPrint("🔥 USER DELETED SUCCESSFULLY");
+
+      // ✅ 3. Clear local storage
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
 
-      // Sign out from Google
+      // ✅ 4. Google sign out
       final googleSignIn = GoogleSignIn();
       if (await googleSignIn.isSignedIn()) {
         await googleSignIn.signOut();
       }
 
-      // Delete Firebase Auth account
-      await user.delete();
+      // ✅ 5. Firebase sign out
+      await FirebaseAuth.instance.signOut();
 
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account deleted successfully'),
-            backgroundColor: Colors.green,
-          ),
+      if (!context.mounted) return;
+
+      // ✅ Close bottom sheet
+      Navigator.of(context, rootNavigator: true).pop();
+
+      // ✅ Go to Home/Profile (auth-aware)
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MainScreen()),
+        (_) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        debugPrint("🔐 Re-auth required");
+
+        if (!context.mounted) return;
+
+        await _reauthenticateUser(context);
+
+        debugPrint("🔁 Retrying deletion");
+
+        // ✅ Firestore FIRST again
+        await _deleteUserFirestoreDataByUid(uid);
+
+        // ✅ Then auth delete
+        await user.delete();
+
+        await FirebaseAuth.instance.signOut();
+
+        if (!context.mounted) return;
+
+        Navigator.of(context, rootNavigator: true).pop();
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MainScreen()),
+          (_) => false,
         );
+      } else {
+        _showDeleteError(context, e.message);
+      }
+    } catch (e) {
+      debugPrint("❌ Delete failed: $e");
+      _showDeleteError(context, e.toString());
+    }
+  }
+
+  Future<void> _deleteUserFirestoreDataByUid(String uid) async {
+    final firestore = FirebaseFirestore.instance;
+    final userRef = firestore.collection('users').doc(uid);
+
+    final batch = firestore.batch();
+
+    // Delete anime subcollection
+    final animeSnapshot = await userRef.collection('anime').get();
+    for (final doc in animeSnapshot.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // Delete episode notifications
+    final notifSnapshot = await userRef
+        .collection('episode_notifications')
+        .get();
+    for (final doc in notifSnapshot.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // Delete user document itself
+    batch.delete(userRef);
+
+    await batch.commit();
+  }
+
+  void _showDeleteError(BuildContext context, String? message) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message ?? "Account deletion failed"),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  Future<void> _reauthenticateUser(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final providerId = user.providerData.first.providerId;
+
+    try {
+      // 🔐 Google Sign-In re-auth
+      if (providerId == 'google.com') {
+        final googleUser = await GoogleSignIn().signIn();
+        if (googleUser == null) throw Exception("Google sign-in cancelled");
+
+        final googleAuth = await googleUser.authentication;
+
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+
+        await user.reauthenticateWithCredential(credential);
+      }
+      // 🔐 Email & Password re-auth
+      else if (providerId == 'password') {
+        final password = await _askForPassword(context);
+        if (password == null) throw Exception("Password required");
+
+        final credential = EmailAuthProvider.credential(
+          email: user.email!,
+          password: password,
+        );
+
+        await user.reauthenticateWithCredential(credential);
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error deleting account: $e'),
+          const SnackBar(
+            content: Text("Re-authentication failed"),
             backgroundColor: Colors.red,
           ),
         );
       }
+      rethrow;
     }
+  }
+
+  Future<String?> _askForPassword(BuildContext context) async {
+    final controller = TextEditingController();
+
+    return showDialog<String>(
+      context: Navigator.of(context, rootNavigator: true).context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text("Confirm Password"),
+        content: TextField(
+          controller: controller,
+          obscureText: true,
+          decoration: const InputDecoration(hintText: "Enter your password"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text("Confirm"),
+          ),
+        ],
+      ),
+    );
   }
 }
