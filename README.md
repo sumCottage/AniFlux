@@ -30,6 +30,14 @@ It allows users to **search, browse, and track anime**, with **cloud sync using 
   <sub>Coming soon on Google Play</sub>
 </p>
 
+## 📱 Screenshots
+
+| Home Screen | Anime Details | Search | Profile |
+|:---:|:---:|:---:|:---:|
+| <img src="assets/screenshots/home.png" width="200" alt="Home" /> | <img src="assets/screenshots/details.png" width="200" alt="Details" /> | <img src="assets/screenshots/search.png" width="200" alt="Search" /> | <img src="assets/screenshots/profile.png" width="200" alt="Profile" /> |
+
+---
+
 ## 📈 Development Activity
 
 <p align="center">
@@ -81,15 +89,13 @@ It allows users to **search, browse, and track anime**, with **cloud sync using 
 
 ## 🏗️ Tech Stack
 
-| Technology | Purpose |
-|-----------|--------|
-| **Flutter 3** | Cross-platform UI |
-| **Dart** | Programming language |
-| **AniList GraphQL API** | Anime data source |
-| **Firebase Core** | Backend services |
-| **Cloud Firestore** | User data storage |
-| **Firebase Auth** | Authentication |
-| **Appwrite Functions** | Cloud Functions |
+| Technology | Icon | Purpose |
+|-----------|:---:|--------|
+| **Flutter 3** | <img src="https://skillicons.dev/icons?i=flutter" width="20"/> | Cross-platform UI Framework |
+| **Dart** | <img src="https://skillicons.dev/icons?i=dart" width="20"/> | Programming Language |
+| **Firebase** | <img src="https://skillicons.dev/icons?i=firebase" width="20"/> | Auth, Database, & Backend |
+| **Appwrite** | <img src="https://skillicons.dev/icons?i=appwrite" width="20"/> | Cloud Functions |
+| **GraphQL** | <img src="https://skillicons.dev/icons?i=graphql" width="20"/> | AniList Data Querying |
 
 ---
 
