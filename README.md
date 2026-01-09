@@ -1,9 +1,48 @@
-# 📦 AniFlux — Flutter Anime Tracking App
+<p align="center">
+  <img src="assets/icon/aniflux_logo.png" width="120" alt="AniFlux Logo" />
+</p>
+
+<h1 align="center">AniFlux</h1>
+<p align="center">
+  A Flutter based AniList API with a clean and simple UI.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Flutter-3.x-blue" />
+  <img src="https://img.shields.io/badge/Firebase-Enabled-orange" />
+  <img src="https://img.shields.io/badge/License-MIT-green" />
+</p>
+
 
 AniFlux is a modern **Flutter-based anime tracking application** inspired by **MyAnimeList** and **AniList**.  
-It allows users to **search, browse, and track anime**, with **cloud sync using Firebase** and **live data from the AniList GraphQL API**.
+It allows users to **search, browse, and track anime**, with **cloud sync using Firebase and Appwrite** and **live data from the AniList GraphQL API**.
 
 ---
+
+<h2 align="center">📥 Download</h2>
+
+<p align="center">
+  <img
+    src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+    width="220"
+  />
+  <br/>
+  <sub>Coming soon on Google Play</sub>
+</p>
+
+## 📈 Development Activity
+
+<p align="center">
+  <img
+    src="https://github-readme-activity-graph.vercel.app/graph?username=som120&repo=AniFlux&theme=github-compact"
+    alt="AniFlux commit activity graph"
+  />
+</p>
+
+
+
+---
+
 
 ## 🚀 Features
 
@@ -49,24 +88,62 @@ It allows users to **search, browse, and track anime**, with **cloud sync using 
 | **AniList GraphQL API** | Anime data source |
 | **Firebase Core** | Backend services |
 | **Cloud Firestore** | User data storage |
-| **Firebase Auth** *(coming soon)* | Authentication |
+| **Firebase Auth** | Authentication |
+| **Appwrite Functions** | Cloud Functions |
 
 ---
 
 ## 📁 Project Structure
 
-lib/
-├── screens/
-│ ├── search_screen.dart
-│ ├── anime_detail_screen.dart
-│ ├── home_screen.dart
-│ └── profile_screen.dart
+```text
+AniFlux/
+├── android/
+├── assets/
+├── backend/
+├── build/
+├── functions/
+├── ios/
+├── lib/
+│   ├── screens/
+│   │   ├── anime_detail_screen.dart
+│   │   ├── avatar_picker_screen.dart
+│   │   ├── character_detail_screen.dart
+│   │   ├── forgot_password_screen.dart
+│   │   ├── home_screen.dart
+│   │   ├── login_screen.dart
+│   │   ├── profile_screen.dart
+│   │   ├── search_screen.dart
+│   │   └── signup_screen.dart
+│   │
+│   ├── services/
+│   │   ├── anilist_service.dart
+│   │   ├── app_update_service.dart
+│   │   ├── auth_service.dart
+│   │   └── notification_service.dart
+│   │
+│   ├── theme/
+│   │   └── app_theme.dart
+│   │
+│   ├── utils/
+│   │   ├── light_skeleton.dart
+│   │   └── transitions.dart
+│   │
+│   ├── widgets/
+│   │   ├── account_settings_bottom_sheet.dart
+│   │   ├── anime_entry_bottom_sheet.dart
+│   │   ├── avatar_picker_bottom_sheet.dart
+│   │   ├── edit_profile_bottom_sheet.dart
+│   │   └── auth_wrapper.dart
+│   │
+│   ├── firebase_options.dart
+│   └── main.dart
 │
-├── services/
-│ └── anilist_service.dart
-│
-├── firebase_options.dart
-└── main.dart
+├── linux/
+├── macos/
+├── web/
+└── pubspec.yaml
+```
+
 
 ---
 
@@ -76,13 +153,15 @@ lib/
 ```bash
 git clone https://github.com/<your-username>/AniFlux.git
 cd AniFlux
-
+```
+```bash
 flutter pub get
-
+```
+```bash
 flutterfire configure
-
+```
+```bash
 flutter run
-
 ```
 ---
 
@@ -130,13 +209,18 @@ Commit your changes
 Open a pull request
 
 ---
-## 📜 License
+## 📜 Legal & Community
 
-MIT License — free to use for learning and development.
+This project is licensed under the **MIT License** and follows open-source best practices.
+
+- 📄 [MIT License](LICENSE)
+- 🤝 [Contributing Guidelines](CONTRIBUTING.md)
+- 🧭 [Code of Conduct](CODE_OF_CONDUCT.md)
+- 🔐 [Security Policy](SECURITY.md)
+
+Please read the respective files in the repository for more details.
 
 ---
-## 💙 Author
-
-Somnath
-Flutter Developer & Anime Enthusiast
-
+<p align="center">
+  Built with ❤️ using Flutter • Firebase • AppWrite • AniList API
+</p>
