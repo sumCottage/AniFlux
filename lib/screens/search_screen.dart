@@ -12,6 +12,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ainme_vault/utils/transitions.dart';
 
 class SearchScreen extends StatefulWidget {
   final String? initialGenre;
@@ -887,9 +888,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                 setState(() {});
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        AnimeDetailScreen(anime: anime),
+                                  SlideLeftRoute(
+                                    page: AnimeDetailScreen(anime: anime),
                                   ),
                                 );
                               },
@@ -1468,9 +1468,7 @@ class _CalendarViewState extends State<_CalendarView> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => AnimeDetailScreen(anime: media),
-          ),
+          SlideLeftRoute(page: AnimeDetailScreen(anime: media)),
         );
       },
       child: ClipRRect(

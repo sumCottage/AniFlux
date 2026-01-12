@@ -39,3 +39,30 @@ class SlideRightRoute extends PageRouteBuilder {
             },
       );
 }
+
+class SlideLeftRoute<T> extends PageRouteBuilder<T> {
+  final Widget page;
+
+  SlideLeftRoute({required this.page})
+    : super(
+        pageBuilder: (context, animation, secondaryAnimation) => page,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          // Using a slightly smoother curve than standard easeInOut
+          const curve = Curves.easeOutCubic;
+
+          var tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: curve));
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 400),
+        reverseTransitionDuration: const Duration(milliseconds: 400),
+      );
+}
