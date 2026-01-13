@@ -11,7 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ainme_vault/services/app_update_service.dart';
-import 'package:ainme_vault/utils/transitions.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -579,7 +578,9 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         Navigator.push(
           context,
-          SlideLeftRoute(page: AnimeDetailScreen(anime: anime)),
+          MaterialPageRoute(
+            builder: (context) => AnimeDetailScreen(anime: anime),
+          ),
         );
       },
       child: Container(
@@ -900,7 +901,9 @@ class _MyAnimeListState extends State<MyAnimeList> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    SlideLeftRoute(page: AnimeDetailScreen(anime: anime)),
+                    MaterialPageRoute(
+                      builder: (context) => AnimeDetailScreen(anime: anime),
+                    ),
                   );
                 },
                 child: ClipRRect(

@@ -118,7 +118,7 @@ class ProfileScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      SlideLeftRoute(page: const LoginScreen()),
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -483,7 +483,10 @@ class ProfileScreen extends StatelessWidget {
             }
           }
         } else if (title == "About") {
-          Navigator.push(context, SlideLeftRoute(page: const AboutScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AboutScreen()),
+          );
         } else if (title == "Edit Profile") {
           // Show edit profile bottom sheet
           final result = await showModalBottomSheet(
