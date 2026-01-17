@@ -243,6 +243,14 @@ Please read the respective files in the repository for more details.
 
 ---
 
+## Disclaimer
+
+AniFlux is a third-party client and is not affiliated with, endorsed by, or sponsored by AniList.
+
+AniList content and trademarks belong to their respective owners.
+
+---
+
 <p align="center">
   Built with ❤️ using Flutter • Firebase • AppWrite • AniList API
 </p>
