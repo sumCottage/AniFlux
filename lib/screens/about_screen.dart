@@ -453,12 +453,6 @@ class _AboutScreenState extends State<AboutScreen> {
                 child: Column(
                   children: [
                     _buildListTile(
-                      icon: Icons.code,
-                      title: "GitHub Repository",
-                      onTap: () =>
-                          _launchUrl("https://github.com/som120/AniFlux"),
-                    ),
-                    _buildListTile(
                       icon: Icons.people_outline,
                       title: "Contributors",
                       onTap: () {
@@ -494,6 +488,17 @@ class _AboutScreenState extends State<AboutScreen> {
             const Text(
               "Made with ❤️ by Somnath",
               style: TextStyle(color: Colors.black45, fontSize: 12),
+            ),
+            const SizedBox(height: 8),
+            IconButton(
+              onPressed: () => _launchUrl("https://github.com/som120/AniFlux"),
+              icon: Image.network(
+                "https://cdn-icons-png.flaticon.com/512/25/25231.png",
+                width: 24,
+                height: 24,
+                color: Colors.black45,
+              ),
+              tooltip: 'GitHub Repository',
             ),
             const SizedBox(height: 20),
           ],
