@@ -42,6 +42,22 @@ class _SearchScreenState extends State<SearchScreen> {
   Set<String> _userAnimeIds = {};
   StreamSubscription? _userListSubscription;
 
+  // ====== STALE REQUEST CANCELLATION ======
+  // Session IDs to cancel pending API requests when user types quickly
+  // or switches filters rapidly. Each new request increments the session ID,
+  // and when a response returns, it checks if it's still the active session.
+  // If not, the response is discarded to prevent stale data from overwriting
+  // newer results.
+  int _searchSessionId = 0;
+  int _categorySessionId = 0;
+
+  // ====== CENTRALIZED RETRY LOGIC ======
+  // Stores the last API call function so retry logic is in ONE place.
+  // Before: Retry logic was duplicated in _retryLastAction AND _buildErrorWidget
+  // After: Both just call _retryLastAction(), which uses this stored function.
+  // Benefits: No code duplication, no logic drift, easy to maintain.
+  Future<List> Function()? _lastApiCall;
+
   @override
   void initState() {
     super.initState();
@@ -102,30 +118,30 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  /// ====== CENTRALIZED RETRY LOGIC ======
+  /// Single source of truth for retrying the last action.
+  /// Called by:
+  ///   - Error widget retry button
+  ///   - Auto-retry on network restoration
+  ///   - Pull-to-refresh (if implemented)
+  ///
+  /// Uses [_lastApiCall] stored by [_fetchAnimeByCategory] to avoid
+  /// duplicating filter-to-API-call mapping everywhere.
   Future<void> _retryLastAction() async {
     if (selectedFilter == "Search") {
+      // Search uses the text field content, not stored API call
       await _performSearch(_controller.text);
-    } else if (selectedFilter == "Calendar") {
-      // Calendar view has its own error handling, just refresh the state
+    } else if (selectedFilter == "Calendar" || selectedFilter == "Seasonal") {
+      // These views have their own FutureBuilder error handling
+      // Just reset error state to trigger rebuild
       setState(() {
         hasError = false;
       });
-    } else if (selectedFilter == "Seasonal") {
-      setState(() {
-        hasError = false;
-      });
-    } else if (selectedFilter == "Top 100") {
-      await _fetchAnimeByCategory("Top 100", AniListService.getTopAnime);
-    } else if (selectedFilter == "Popular") {
-      await _fetchAnimeByCategory("Popular", AniListService.getPopularAnime);
-    } else if (selectedFilter == "Upcoming") {
-      await _fetchAnimeByCategory("Upcoming", AniListService.getUpcomingAnime);
-    } else if (selectedFilter == "Airing") {
-      await _fetchAnimeByCategory("Airing", AniListService.getAiringAnime);
-    } else if (selectedFilter == "Movies") {
-      await _fetchAnimeByCategory("Movies", AniListService.getTopMovies);
+    } else if (_lastApiCall != null) {
+      // Use stored API call - cleaner and guaranteed to match
+      await _fetchAnimeByCategory(selectedFilter, _lastApiCall!);
     } else {
-      // Fallback: default to Top 100
+      // Fallback: should rarely happen, default to Top 100
       await _fetchAnimeByCategory("Top 100", AniListService.getTopAnime);
     }
   }
@@ -258,6 +274,17 @@ class _SearchScreenState extends State<SearchScreen> {
       return;
     }
 
+    // ====== STORE API CALL FOR RETRY ======
+    // Save the API call function so _retryLastAction can use it
+    // without needing to duplicate the filter-to-API mapping
+    _lastApiCall = apiCall;
+
+    // ====== STALE REQUEST CANCELLATION ======
+    // Increment session ID to invalidate any pending requests.
+    // When the API response returns, we'll check if currentSessionId
+    // still matches _categorySessionId. If not, this request is stale.
+    final currentSessionId = ++_categorySessionId;
+
     setState(() {
       isLoading = true;
       hasError = false; // Reset error state on new fetch
@@ -277,6 +304,15 @@ class _SearchScreenState extends State<SearchScreen> {
       final data = await apiCall();
       if (!mounted) return;
 
+      // ====== CHECK FOR STALE RESPONSE ======
+      // If user switched filters while we were loading, discard this response
+      if (currentSessionId != _categorySessionId) {
+        debugPrint(
+          "⏭️ Stale category request ignored: $filterName (session $currentSessionId, current $_categorySessionId)",
+        );
+        return;
+      }
+
       // For search, an empty list is a valid result (no results).
       // For categories (Top 100, Popular, etc), an empty list likely indicates a fetch error.
       if (data.isEmpty && filterName != "Search") {
@@ -294,6 +330,8 @@ class _SearchScreenState extends State<SearchScreen> {
       });
     } catch (e) {
       if (!mounted) return;
+      // Only show error if this is still the active request
+      if (currentSessionId != _categorySessionId) return;
       setState(() {
         isLoading = false;
         hasError = true;
@@ -307,7 +345,21 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<void> _performSearch(String text) async {
     if (text.isEmpty) return;
 
+    // ====== STALE REQUEST CANCELLATION ======
+    // Increment search session to cancel any pending searches.
+    // If user types "Na" then "Nar" then "Naruto", only "Naruto" results show.
+    final currentSearchSession = ++_searchSessionId;
+
     await _addToHistory(text);
+
+    // Check if search was superseded before making API call
+    if (currentSearchSession != _searchSessionId) {
+      debugPrint(
+        "⏭️ Search cancelled before API call: '$text' (session $currentSearchSession, current $_searchSessionId)",
+      );
+      return;
+    }
+
     await _fetchAnimeByCategory(
       "Search",
       () => AniListService.searchAnime(text),
@@ -599,43 +651,10 @@ class _SearchScreenState extends State<SearchScreen> {
               style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
             ),
             const SizedBox(height: 24),
-            _RetryButton(
-              onPressed: () async {
-                if (selectedFilter == "Search") {
-                  await _performSearch(_controller.text);
-                } else {
-                  // Re-fetch current category
-                  // Note: We need a way to call the original apiCall.
-                  // Since we don't store the apiCall, we can just call the category fetch logic again.
-                  if (selectedFilter == "Top 100") {
-                    await _fetchAnimeByCategory(
-                      "Top 100",
-                      AniListService.getTopAnime,
-                    );
-                  } else if (selectedFilter == "Popular") {
-                    await _fetchAnimeByCategory(
-                      "Popular",
-                      AniListService.getPopularAnime,
-                    );
-                  } else if (selectedFilter == "Upcoming") {
-                    await _fetchAnimeByCategory(
-                      "Upcoming",
-                      AniListService.getUpcomingAnime,
-                    );
-                  } else if (selectedFilter == "Airing") {
-                    await _fetchAnimeByCategory(
-                      "Airing",
-                      AniListService.getAiringAnime,
-                    );
-                  } else if (selectedFilter == "Movies") {
-                    await _fetchAnimeByCategory(
-                      "Movies",
-                      AniListService.getTopMovies,
-                    );
-                  }
-                }
-              },
-            ),
+            // ====== USES CENTRALIZED RETRY ======
+            // Before: 35 lines of duplicated filter-specific logic
+            // After: Single method call - no duplication, no drift
+            _RetryButton(onPressed: _retryLastAction),
           ],
         ),
       ),
@@ -852,7 +871,11 @@ class _SearchScreenState extends State<SearchScreen> {
                         padding: const EdgeInsets.only(bottom: 100),
                         keyboardDismissBehavior:
                             ScrollViewKeyboardDismissBehavior.onDrag,
-                        cacheExtent: 100,
+                        // ====== INCREASED CACHE EXTENT ======
+                        // Pre-renders ~5 extra items off-screen for smoother scrolling.
+                        // Before: 100px (~1 item) - caused visible pop-in on fast scroll
+                        // After: 500px (~5 items) - images pre-load before becoming visible
+                        cacheExtent: 500,
                         itemCount: animeList.length,
                         itemBuilder: (context, index) {
                           final anime = animeList[index];
@@ -1261,7 +1284,15 @@ class FadeInImageWidget extends StatelessWidget {
           width: width,
           height: height,
           fit: BoxFit.cover,
-          memCacheWidth: (width * 3).toInt(), // Optimize memory usage
+          // ====== MEMORY CACHE LIMITS ======
+          // Limit image size in memory to reduce RAM usage.
+          // Without limits: Full-res images (e.g., 1000x1500px = ~4.5MB each)
+          // With limits: Downscaled to ~2x display size (~0.3MB each)
+          // For 100 images: 450MB → 30MB RAM savings
+          memCacheWidth: (width * 2).toInt(),
+          memCacheHeight: (height * 2).toInt(),
+          maxWidthDiskCache: 300,
+          maxHeightDiskCache: 400,
           placeholder: (context, url) => Container(color: Colors.grey[200]),
           errorWidget: (context, url, error) => Container(
             color: Colors.grey[300],
@@ -1414,6 +1445,9 @@ class _CalendarViewState extends State<_CalendarView> {
 
               return GridView.builder(
                 padding: const EdgeInsets.only(bottom: 100),
+                // ====== CACHE EXTENT FOR SMOOTH SCROLLING ======
+                // Pre-renders ~3-4 rows of grid items off-screen
+                cacheExtent: 400,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   childAspectRatio: 0.65,
@@ -1486,6 +1520,12 @@ class _CalendarViewState extends State<_CalendarView> {
                   ? CachedNetworkImage(
                       imageUrl: image,
                       fit: BoxFit.cover,
+                      // ====== MEMORY CACHE LIMITS ======
+                      // Grid cards are ~120px wide, so 240px memory cache is sufficient
+                      memCacheWidth: 240,
+                      memCacheHeight: 360,
+                      maxWidthDiskCache: 300,
+                      maxHeightDiskCache: 450,
                       placeholder: (context, url) =>
                           Container(color: Colors.grey[200]),
                       errorWidget: (context, url, error) => Container(
@@ -1979,6 +2019,9 @@ class _SeasonalViewState extends State<_SeasonalView> {
 
               return GridView.builder(
                 padding: const EdgeInsets.only(bottom: 100),
+                // ====== CACHE EXTENT FOR SMOOTH SCROLLING ======
+                // Pre-renders ~3-4 rows of grid items off-screen
+                cacheExtent: 400,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   childAspectRatio: 0.65,
@@ -2044,6 +2087,12 @@ class _SeasonalViewState extends State<_SeasonalView> {
                   ? CachedNetworkImage(
                       imageUrl: image,
                       fit: BoxFit.cover,
+                      // ====== MEMORY CACHE LIMITS ======
+                      // Grid cards are ~120px wide, so 240px memory cache is sufficient
+                      memCacheWidth: 240,
+                      memCacheHeight: 360,
+                      maxWidthDiskCache: 300,
+                      maxHeightDiskCache: 450,
                       placeholder: (context, url) =>
                           Container(color: Colors.grey[200]),
                       errorWidget: (context, url, error) => Container(
