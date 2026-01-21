@@ -19,28 +19,28 @@ It allows users to **search, browse, and track anime**, with **cloud sync using 
 
 ---
 
-<h2 align="center">📥 Download</h2>
+<h2 align="center">⬇️ Download AniFlux</h2>
 
 <p align="center">
-  <img
-    src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
-    width="220"
-  />
-  <br/>
-  <sub>Coming soon on Google Play</sub>
+  <strong>The fluid way to track anime. Available now.</strong>
 </p>
 
----
-
-<h2 align="center">☕ Support AniFlux</h2>
-
-<p align="center">If you like <strong>AniFlux</strong> and want to support its development, 
-  <br>consider buying me a coffee ❤️  
-Every contribution helps keep the app free and ad-free.</p>
 <p align="center">
-<a href="https://www.buymeacoffee.com/sompaul" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" width="200">
-</a>
+  <a href="https://github.com/som120/AniFlux/releases/latest">
+    <img src="https://img.shields.io/badge/Download_APK-GitHub-24292e?style=for-the-badge&logo=github&logoColor=white&height=50" height="50" alt="Download from GitHub" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="#">
+    <img src="https://img.shields.io/badge/Google_Play-Coming_Soon-lightgrey?style=for-the-badge&logo=googleplay&logoColor=grey&height=50" height="50" alt="Google Play Coming Soon" />
+  </a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/som120/AniFlux?style=flat-square&color=2979FF&label=Latest%20Version" alt="Latest Version" />
+  &nbsp;
+  <img src="https://img.shields.io/github/downloads/som120/AniFlux/total?style=flat-square&color=success&label=Total%20Downloads" alt="Total Downloads" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/APK_Size-59.3_MB-orange?style=flat-square" alt="APK Size" />
 </p>
 
 ---
@@ -65,6 +65,15 @@ Every contribution helps keep the app free and ad-free.</p>
 
 
 ---
+## 📈 Project Growth
+
+<p align="center">
+  <a href="https://star-history.com/#som120/AniFlux&Date">
+    <img src="https://api.star-history.com/svg?repos=som120/AniFlux&type=Date" alt="Star History Chart" />
+  </a>
+</p>
+
+---
 
 
 ## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Travel%20and%20Places/Rocket.webp" alt="Rocket" width="50" height="50" /> Features
@@ -75,9 +84,11 @@ Every contribution helps keep the app free and ad-free.</p>
 - Displays poster, rating, release year
 - Fast filters:
   - Top 100
+  - Calandar
+  - Seasonal
   - Popular
-  - Airing
   - Upcoming
+  - Airing
   - Movies
 
 ### 🎨 Modern UI
@@ -100,6 +111,12 @@ Every contribution helps keep the app free and ad-free.</p>
 - Store user watchlist & progress
 - Real-time cloud sync *(coming soon)*
 
+### <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Animals%20and%20Nature/Dove.webp" alt="Dove" width="25" height="25" /> Seamless Updates
+- Powered by **Shorebird** Code Push
+- Get **instant bug fixes** and performance improvements
+- No need to re-download the APK for minor updates
+- OTA (Over-The-Air) patching enabled
+
 ---
 
 ## 🏗️ Tech Stack
@@ -111,6 +128,7 @@ Every contribution helps keep the app free and ad-free.</p>
 | **Firebase** | <img src="https://skillicons.dev/icons?i=firebase" width="20"/> | Auth, Database, & Backend |
 | **Appwrite** | <img src="https://skillicons.dev/icons?i=appwrite" width="20"/> | Cloud Functions |
 | **GraphQL** | <img src="https://skillicons.dev/icons?i=graphql" width="20"/> | AniList Data Querying |
+| **Shorebird** | <img src="https://avatars.githubusercontent.com/u/135552150?s=200&v=4" width="20"/> | OTA Code Push & Updates |
 
 ---
 
