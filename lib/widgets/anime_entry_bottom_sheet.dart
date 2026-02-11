@@ -760,13 +760,46 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                     .delete();
 
                                 // 🔄 Two-way sync: Also delete from AniList if connected
-                                AniListSyncService.deleteFromAniList(
-                                  mediaId: widget.anime['id'],
-                                );
+                                final int animeId = widget.anime['id'] is int
+                                    ? widget.anime['id']
+                                    : int.tryParse(
+                                            widget.anime['id'].toString(),
+                                          ) ??
+                                          0;
+                                final anilistDeleted =
+                                    await AniListSyncService.deleteFromAniList(
+                                      mediaId: animeId,
+                                    );
 
                                 if (context.mounted) {
-                                  Navigator.pop(context); // Close dialog
                                   Navigator.pop(context); // Close bottom sheet
+
+                                  // Show feedback about AniList sync
+                                  if (anilistDeleted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text(
+                                          'Removed from list and AniList',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        backgroundColor: Colors.green,
+                                        behavior: SnackBarBehavior.floating,
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 12,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                        ),
+                                        duration: const Duration(seconds: 2),
+                                      ),
+                                    );
+                                  }
                                 }
                               } catch (e) {
                                 if (context.mounted) {

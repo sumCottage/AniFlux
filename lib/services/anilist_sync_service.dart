@@ -131,22 +131,36 @@ class AniListSyncService {
 
   /// Delete an anime entry from AniList
   static Future<bool> deleteFromAniList({required int mediaId}) async {
+    debugPrint('🗑️ deleteFromAniList called with mediaId: $mediaId');
+
     final token = await AniListAuthService.getAccessToken();
     if (token == null) {
       debugPrint('⚠️ Not logged in to AniList, skipping delete');
       return false;
     }
 
-    // First, we need to get the list entry ID for this media
+    debugPrint('🔑 Got AniList token, proceeding with delete...');
+
+    // Get the user's ID first
+    final userInfo = await AniListAuthService.getStoredUserInfo();
+    final userId = userInfo['userId'];
+    if (userId == null) {
+      debugPrint('❌ No AniList user ID found');
+      return false;
+    }
+
+    // First, we need to get the list entry ID for this media (for THIS user)
     const getEntryQuery = '''
-      query GetMediaListEntry(\$mediaId: Int!) {
-        MediaList(mediaId: \$mediaId) {
+      query GetMediaListEntry(\$mediaId: Int!, \$userId: Int!) {
+        MediaList(mediaId: \$mediaId, userId: \$userId) {
           id
         }
       }
     ''';
 
     try {
+      debugPrint('📤 Fetching entry ID for mediaId: $mediaId, userId: $userId');
+
       // Get the entry ID
       final getResponse = await http.post(
         Uri.parse(_graphqlUrl),
@@ -157,9 +171,12 @@ class AniListSyncService {
         },
         body: jsonEncode({
           'query': getEntryQuery,
-          'variables': {'mediaId': mediaId},
+          'variables': {'mediaId': mediaId, 'userId': int.parse(userId)},
         }),
       );
+
+      debugPrint('📥 Get entry response: ${getResponse.statusCode}');
+      debugPrint('📥 Get entry body: ${getResponse.body}');
 
       if (getResponse.statusCode != 200) {
         debugPrint('❌ Failed to get AniList entry: ${getResponse.body}');
@@ -170,9 +187,13 @@ class AniListSyncService {
       final entryId = getData['data']?['MediaList']?['id'];
 
       if (entryId == null) {
-        debugPrint('⚠️ Anime not found in AniList, nothing to delete');
+        debugPrint(
+          '⚠️ Anime not found in AniList (mediaId: $mediaId), nothing to delete',
+        );
         return true; // Not an error, just doesn't exist
       }
+
+      debugPrint('🎯 Found entry ID: $entryId, proceeding to delete...');
 
       // Now delete the entry
       const deleteMutation = '''
@@ -195,6 +216,9 @@ class AniListSyncService {
           'variables': {'id': entryId},
         }),
       );
+
+      debugPrint('📥 Delete response: ${deleteResponse.statusCode}');
+      debugPrint('📥 Delete body: ${deleteResponse.body}');
 
       if (deleteResponse.statusCode == 200) {
         final deleteData = jsonDecode(deleteResponse.body);
