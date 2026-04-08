@@ -91,7 +91,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
               color: active
-                  ? const Color(0xFF714FDC).withOpacity(0.2)
+                  ? const Color(0xFF714FDC).withValues(alpha: 0.2)
                   : Colors.transparent,
             ),
             child: Column(
@@ -181,7 +181,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -245,8 +245,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     _updateSystemNavBar(context);
 
-    return WillPopScope(
-      onWillPop: _handleBackPress,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBackPress();
+      },
       child: Scaffold(
         backgroundColor: Colors.grey[100],
         body: Stack(
@@ -293,19 +297,19 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                     filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(
-                          0.18,
+                        color: Colors.white.withValues(
+                          alpha: 0.18,
                         ), // transparent glass
                         borderRadius: BorderRadius.circular(40),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.5), // glass border
+                          color: Colors.white.withValues(alpha: 0.5), // glass border
                           width: 1.2,
                         ),
                         boxShadow: [
                           BoxShadow(
                             color: const Color(
                               0xFF714FDC,
-                            ).withOpacity(0.2), // purple glow
+                            ).withValues(alpha: 0.2), // purple glow
                             blurRadius: 25,
                             spreadRadius: 1,
                           ),

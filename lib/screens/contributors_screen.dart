@@ -114,7 +114,7 @@ class _ContributorsScreenState extends State<ContributorsScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -130,7 +130,7 @@ class _ContributorsScreenState extends State<ContributorsScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: const Color(0xFF8A5CF6).withOpacity(0.5),
+                          color: const Color(0xFF8A5CF6).withValues(alpha: 0.5),
                           width: 2,
                         ),
                       ),

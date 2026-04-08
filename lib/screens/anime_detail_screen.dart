@@ -273,8 +273,8 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  Colors.black.withOpacity(0.3),
-                                  Colors.black.withOpacity(0.7),
+                                  Colors.black.withValues(alpha: 0.3),
+                                  Colors.black.withValues(alpha: 0.7),
                                 ],
                                 stops: const [0.0, 1.0],
                               ),
@@ -307,7 +307,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.25),
+                            color: Colors.black.withValues(alpha: 0.25),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -475,7 +475,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                                                   ),
                                                   decoration: BoxDecoration(
                                                     color: Colors.white
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                     shape: BoxShape.circle,
                                                   ),
                                                   child: const Icon(
@@ -605,7 +605,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
             borderRadius: BorderRadius.circular(25),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.14),
+                color: Colors.black.withValues(alpha: 0.14),
                 blurRadius: 15,
                 spreadRadius: 2,
                 offset: const Offset(0, 3),
@@ -696,7 +696,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.12),
+              color: Colors.black.withValues(alpha: 0.12),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -828,10 +828,10 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withOpacity(0.1),
+                    color: AppTheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: AppTheme.primary.withOpacity(0.05),
+                      color: AppTheme.primary.withValues(alpha: 0.05),
                     ),
                   ),
                   child: Text(
@@ -870,7 +870,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 1),
           ),
@@ -928,9 +928,9 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
+                      color: color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: color.withOpacity(0.3)),
+                      border: Border.all(color: color.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -986,7 +986,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                       borderRadius: BorderRadius.circular(30),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
+                          color: Colors.black.withValues(alpha: 0.15),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -1017,7 +1017,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withValues(alpha: 0.15),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
@@ -1038,7 +1038,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                       alignment: Alignment.topCenter,
                       children: <Widget>[
                         ...previousChildren,
-                        if (currentChild != null) currentChild,
+                        ?currentChild,
                       ],
                     );
                   },
@@ -1243,7 +1243,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
           _buildDetailRow("Source", source, Icons.local_offer_rounded),
 
           const SizedBox(height: 10),
-          Divider(color: Colors.grey.withOpacity(0.5)),
+          Divider(color: Colors.grey.withValues(alpha: 0.5)),
           const SizedBox(height: 10),
 
           // Studio
@@ -1253,7 +1253,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
               Icon(
                 Icons.movie_creation_rounded,
                 size: 20,
-                color: AppTheme.primary.withOpacity(0.75),
+                color: AppTheme.primary.withValues(alpha: 0.75),
               ),
               const SizedBox(width: 8),
               Text(
@@ -1287,7 +1287,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                 Icon(
                   Icons.play_circle_fill_rounded,
                   size: 20,
-                  color: AppTheme.primary.withOpacity(0.75),
+                  color: AppTheme.primary.withValues(alpha: 0.75),
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -1351,7 +1351,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.6),
+                              color: Colors.black.withValues(alpha: 0.6),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -1378,7 +1378,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppTheme.primary.withOpacity(0.75)),
+          Icon(icon, size: 20, color: AppTheme.primary.withValues(alpha: 0.75)),
           const SizedBox(width: 8),
           Text(
             label,
@@ -1484,7 +1484,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.20),
+                            color: Colors.black.withValues(alpha: 0.20),
                             blurRadius: 12,
                             offset: const Offset(0, 6),
                           ),
@@ -1771,7 +1771,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 20,
               offset: const Offset(0, 4),
             ),
@@ -1878,7 +1878,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
               top: 50,
               left: 16,
               child: CircleAvatar(
-                backgroundColor: AppTheme.primary.withOpacity(0.5),
+                backgroundColor: AppTheme.primary.withValues(alpha: 0.5),
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => Navigator.pop(context),
@@ -1911,9 +1911,9 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 14),
       decoration: BoxDecoration(
-        color: AppTheme.primary.withOpacity(0.1),
+        color: AppTheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.primary.withOpacity(0.05)),
+        border: Border.all(color: AppTheme.primary.withValues(alpha: 0.05)),
       ),
       child: Row(
         children: [
@@ -1931,7 +1931,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                     "Ep ${nextEp['episode']} Airing In ",
                     style: TextStyle(
                       fontSize: 13,
-                      color: AppTheme.primary.withOpacity(0.85),
+                      color: AppTheme.primary.withValues(alpha: 0.85),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1983,6 +1983,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                     });
                   }
 
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       behavior: SnackBarBehavior.floating,

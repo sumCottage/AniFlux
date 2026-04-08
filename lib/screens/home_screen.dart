@@ -247,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 ValueListenableBuilder<Color>(
                   valueListenable: _bgColorNotifier,
-                  builder: (_, color, __) {
+                  builder: (_, color, _) {
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 600),
                       curve: Curves.easeOutCubic,
@@ -289,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         // Greeting
                         ValueListenableBuilder<Color>(
                           valueListenable: _bgColorNotifier,
-                          builder: (_, bgColor, __) {
+                          builder: (_, bgColor, _) {
                             final textColor = _isDark(bgColor)
                                 ? Colors.white
                                 : Colors.black87;
@@ -343,7 +343,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               // Indicators - Fixed at 5 dots regardless of anime count
                               ValueListenableBuilder<int>(
                                 valueListenable: _pageIndexNotifier,
-                                builder: (_, current, __) {
+                                builder: (_, current, _) {
                                   // Map current page to dot index (modular)
                                   final activeDotIndex =
                                       current % _visibleDotCount;
@@ -364,8 +364,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         decoration: BoxDecoration(
                                           color: activeDotIndex == index
                                               ? AppTheme.primary
-                                              : AppTheme.accent.withOpacity(
-                                                  0.5,
+                                              : AppTheme.accent.withValues(
+                                                  alpha: 0.5,
                                                 ),
                                           borderRadius: BorderRadius.circular(
                                             4,
@@ -548,7 +548,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppTheme.primary.withOpacity(0.08)
+              ? AppTheme.primary.withValues(alpha: 0.08)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
@@ -609,7 +609,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(50),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -642,7 +642,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withOpacity(0.7),
+                        Colors.black.withValues(alpha: 0.7),
                       ],
                     ),
                   ),
@@ -667,7 +667,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: score > 0
@@ -837,7 +837,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withOpacity(0.1),
+                    color: AppTheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Row(
@@ -1057,7 +1057,7 @@ class _MyAnimeListState extends State<MyAnimeList> {
                         child: CachedNetworkImage(
                           imageUrl: data['coverImage'] ?? '',
                           fit: BoxFit.cover,
-                          errorWidget: (_, __, ___) =>
+                          errorWidget: (_, _, _) =>
                               Container(color: Colors.grey[300]),
                         ),
                       ),
@@ -1071,7 +1071,7 @@ class _MyAnimeListState extends State<MyAnimeList> {
                               end: Alignment.bottomCenter,
                               colors: [
                                 Colors.transparent,
-                                Colors.black.withOpacity(0.85),
+                                Colors.black.withValues(alpha: 0.85),
                               ],
                             ),
                           ),
@@ -1157,14 +1157,14 @@ class _MyAnimeListState extends State<MyAnimeList> {
                 );
               },
               child: Container(
-                key: ValueKey('${doc.id}_${data['status']}_${progress}'),
+                key: ValueKey('${doc.id}_${data['status']}_$progress'),
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Colors.black.withValues(alpha: 0.08),
                       blurRadius: 16,
                       offset: const Offset(0, 8),
                     ),
@@ -1193,7 +1193,7 @@ class _MyAnimeListState extends State<MyAnimeList> {
                             width: 80, // ⬅️ increased
                             height: 115, // ⬅️ increased
                             fit: BoxFit.cover,
-                            errorWidget: (_, __, ___) =>
+                            errorWidget: (_, _, _) =>
                                 Container(color: Colors.grey[300]),
                           ),
                         ),
@@ -1225,8 +1225,8 @@ class _MyAnimeListState extends State<MyAnimeList> {
                                 if (format != null || year != null)
                                   Text(
                                     [
-                                      if (format != null) format,
-                                      if (year != null) year.toString(),
+                                      ?format,
+                                      ?year?.toString(),
                                     ].join(' • '),
                                     style: TextStyle(
                                       fontSize: 12,

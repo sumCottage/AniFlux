@@ -67,6 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       _showSnackBar(message: "Login successful", isError: false);
 
+      if (!mounted) return;
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const MainScreen()),
@@ -128,6 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       _showSnackBar(message: "Signed in with Google", isError: false);
 
+      if (!mounted) return;
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const MainScreen()),
@@ -194,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -273,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -374,7 +376,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: Text(
                                 "Forgot Password?",
                                 style: TextStyle(
-                                  color: AppTheme.primary.withOpacity(0.9),
+                                  color: AppTheme.primary.withValues(alpha: 0.9),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 13, // Reduced size
                                 ),

@@ -50,7 +50,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -336,11 +336,11 @@ class _AboutScreenState extends State<AboutScreen> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
@@ -384,7 +384,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12.withOpacity(0.05),
+                      color: Colors.black12.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
@@ -436,7 +436,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12.withOpacity(0.05),
+                      color: Colors.black12.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
@@ -517,9 +517,9 @@ class _AboutScreenState extends State<AboutScreen> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: (iconColor ?? const Color(0xFF8A5CF6)).withOpacity(0.1),
-          shape: BoxShape.circle,
-        ),
+        color: (iconColor ?? const Color(0xFF8A5CF6)).withValues(alpha: 0.1),
+        shape: BoxShape.circle,
+      ),
         child: Icon(
           icon,
           color: iconColor ?? const Color(0xFF8A5CF6),
@@ -599,7 +599,7 @@ class _AboutScreenState extends State<AboutScreen> {
                       "Version $_version",
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -619,7 +619,7 @@ class _AboutScreenState extends State<AboutScreen> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF8A5CF6).withOpacity(0.1),
+                          color: const Color(0xFF8A5CF6).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(
@@ -737,7 +737,7 @@ class _AboutScreenState extends State<AboutScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -760,7 +760,7 @@ class _AboutScreenState extends State<AboutScreen> {
                       "Last updated: January 2026",
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -908,9 +908,9 @@ class _AboutScreenState extends State<AboutScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF8A5CF6).withOpacity(0.05),
+        color: const Color(0xFF8A5CF6).withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF8A5CF6).withOpacity(0.1)),
+        border: Border.all(color: const Color(0xFF8A5CF6).withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -947,9 +947,9 @@ class _AboutScreenState extends State<AboutScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF8A5CF6).withOpacity(0.05),
+        color: const Color(0xFF8A5CF6).withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF8A5CF6).withOpacity(0.1)),
+        border: Border.all(color: const Color(0xFF8A5CF6).withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1051,7 +1051,7 @@ class _AboutScreenState extends State<AboutScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -1114,7 +1114,7 @@ class _AboutScreenState extends State<AboutScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -1137,7 +1137,7 @@ class _AboutScreenState extends State<AboutScreen> {
                       "${contributors.length} amazing people",
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -1156,10 +1156,10 @@ class _AboutScreenState extends State<AboutScreen> {
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF8A5CF6).withOpacity(0.05),
+                        color: const Color(0xFF8A5CF6).withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: const Color(0xFF8A5CF6).withOpacity(0.1),
+                          color: const Color(0xFF8A5CF6).withValues(alpha: 0.1),
                         ),
                       ),
                       child: InkWell(
@@ -1175,7 +1175,7 @@ class _AboutScreenState extends State<AboutScreen> {
                                 border: Border.all(
                                   color: const Color(
                                     0xFF8A5CF6,
-                                  ).withOpacity(0.5),
+                                  ).withValues(alpha: 0.5),
                                   width: 2,
                                 ),
                               ),
@@ -1216,7 +1216,7 @@ class _AboutScreenState extends State<AboutScreen> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF8A5CF6).withOpacity(0.1),
+                                color: const Color(0xFF8A5CF6).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(
@@ -1278,7 +1278,7 @@ class _AboutScreenState extends State<AboutScreen> {
     try {
       final releases = await _fetchGitHubReleases();
 
-      if (!mounted) return;
+      if (!context.mounted) return;
       Navigator.pop(context); // close loading dialog
 
       showDialog(
@@ -1375,7 +1375,7 @@ class _AboutScreenState extends State<AboutScreen> {
         },
       );
     } catch (e) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       Navigator.pop(context); // close loading dialog
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1386,7 +1386,7 @@ class _AboutScreenState extends State<AboutScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -1454,7 +1454,7 @@ class _AboutScreenState extends State<AboutScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppTheme.green.withOpacity(0.15),
+                      color: AppTheme.green.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
@@ -1476,7 +1476,7 @@ class _AboutScreenState extends State<AboutScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppTheme.primary.withOpacity(0.15),
+                      color: AppTheme.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(

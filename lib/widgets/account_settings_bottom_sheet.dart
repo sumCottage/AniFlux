@@ -117,7 +117,7 @@ class _AccountSettingsBottomSheetState
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12.withOpacity(0.05),
+                      color: Colors.black12.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
@@ -154,7 +154,7 @@ class _AccountSettingsBottomSheetState
                                       Container(
                                         padding: const EdgeInsets.all(6),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.2),
+                                          color: Colors.white.withValues(alpha: 0.2),
                                           shape: BoxShape.circle,
                                         ),
                                         child: const Icon(
@@ -352,9 +352,9 @@ class _AccountSettingsBottomSheetState
             }),
             trackColor: WidgetStateProperty.resolveWith((states) {
               if (states.contains(WidgetState.selected)) {
-                return const Color(0xFFEF4444).withOpacity(0.4);
+                return const Color(0xFFEF4444).withValues(alpha: 0.4);
               }
-              return AppTheme.primary.withOpacity(0.35);
+              return AppTheme.primary.withValues(alpha: 0.35);
             }),
             trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -371,9 +371,9 @@ class _AccountSettingsBottomSheetState
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.08),
+          color: Colors.red.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.red.withOpacity(0.25)),
+          border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -401,7 +401,7 @@ class _AccountSettingsBottomSheetState
       width: 42,
       height: 42,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         shape: BoxShape.circle,
       ),
       child: Icon(icon, color: color, size: 22),
@@ -425,7 +425,7 @@ class _AccountSettingsBottomSheetState
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.12),
+                  color: Colors.red.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(

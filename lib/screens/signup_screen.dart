@@ -64,7 +64,7 @@ class _SignupScreenState extends State<SignupScreen> {
         isError: false,
       );
 
-      Navigator.pop(context); // Back to Login screen
+      if (mounted) Navigator.pop(context); // Back to Login screen
     } on FirebaseAuthException catch (e) {
       String message = "Signup failed";
 
@@ -96,7 +96,7 @@ class _SignupScreenState extends State<SignupScreen> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -171,7 +171,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -297,8 +297,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                       TextSpan(
                                         text: "Terms & conditions",
                                         style: TextStyle(
-                                          color: AppTheme.primary.withOpacity(
-                                            0.9,
+                                          color: AppTheme.primary.withValues(
+                                            alpha: 0.9,
                                           ),
                                           fontWeight: FontWeight.w600,
                                         ),

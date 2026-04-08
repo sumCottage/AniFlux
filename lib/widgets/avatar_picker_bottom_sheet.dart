@@ -393,8 +393,8 @@ class _AvatarPickerBottomSheetState extends State<AvatarPickerBottomSheet> {
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? AppTheme.primary.withOpacity(0.3)
-                  : Colors.black.withOpacity(0.08),
+                  ? AppTheme.primary.withValues(alpha: 0.3)
+                  : Colors.black.withValues(alpha: 0.08),
               blurRadius: isSelected ? 12 : 6,
               offset: const Offset(0, 3),
             ),
@@ -428,7 +428,7 @@ class _AvatarPickerBottomSheetState extends State<AvatarPickerBottomSheet> {
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.black.withOpacity(0.4),
+                  color: Colors.black.withValues(alpha: 0.4),
                 ),
                 child: const Center(
                   child: Icon(
