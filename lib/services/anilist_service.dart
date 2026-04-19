@@ -321,7 +321,7 @@ class AniListService {
           nodes {
             id
             title { romaji }
-            coverImage { medium }
+            coverImage { large medium }
             isAdult
           }
         }

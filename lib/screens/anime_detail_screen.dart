@@ -245,28 +245,31 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          CachedNetworkImage(
-                            imageUrl: banner,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => LightSkeleton(
-                              width: double.infinity,
-                              height: 260,
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(30),
-                                bottomRight: Radius.circular(30),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Container(
-                              color: Colors.grey[900],
-                              child: const Center(
-                                child: Icon(
-                                  Icons.image_not_supported_rounded,
-                                  color: Colors.white24,
-                                  size: 50,
+                          if (banner != null)
+                            CachedNetworkImage(
+                              imageUrl: banner,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => LightSkeleton(
+                                width: double.infinity,
+                                height: 260,
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(30),
+                                  bottomRight: Radius.circular(30),
                                 ),
                               ),
-                            ),
-                          ),
+                              errorWidget: (context, url, error) => Container(
+                                color: Colors.grey[900],
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.image_not_supported_rounded,
+                                    color: Colors.white24,
+                                    size: 50,
+                                  ),
+                                ),
+                              ),
+                            )
+                          else
+                            Container(color: Colors.grey[900]),
                           Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -318,41 +321,54 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen>
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(16),
-                            child: CachedNetworkImage(
-                              imageUrl: poster,
-                              height: 300,
-                              width: 210,
-                              fit: BoxFit.cover,
-                              memCacheWidth: 420,
-                              memCacheHeight: 600,
-                              placeholder: (context, url) => LightSkeleton(
-                                width: 210,
-                                height: 300,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                color: Colors.grey[200],
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.broken_image_rounded,
-                                      color: Colors.grey[400],
-                                      size: 40,
+                            child: poster != null
+                                ? CachedNetworkImage(
+                                    imageUrl: poster,
+                                    height: 300,
+                                    width: 210,
+                                    fit: BoxFit.cover,
+                                    memCacheWidth: 420,
+                                    memCacheHeight: 600,
+                                    placeholder: (context, url) =>
+                                        LightSkeleton(
+                                          width: 210,
+                                          height: 300,
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                          color: Colors.grey[200],
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.broken_image_rounded,
+                                                color: Colors.grey[400],
+                                                size: 40,
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                "No Image",
+                                                style: TextStyle(
+                                                  color: Colors.grey[500],
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                  )
+                                : Container(
+                                    color: Colors.grey[200],
+                                    width: 210,
+                                    height: 300,
+                                    child: const Icon(
+                                      Icons.movie_creation_rounded,
                                     ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "No Image",
-                                      style: TextStyle(
-                                        color: Colors.grey[500],
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                                  ),
                           ),
                           // Green pulsing dot for airing anime (bottom right)
                           if (widget.anime['status'] == 'RELEASING')
