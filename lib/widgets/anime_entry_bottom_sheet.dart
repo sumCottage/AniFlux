@@ -360,9 +360,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                     // Coming from Planning: set to 1
                                     _progress = 1;
                                   }
-                                  if (_startDate == null) {
-                                    _startDate = DateTime.now();
-                                  }
+                                  _startDate ??= DateTime.now();
                                   // Clear finish date when moving back from Completed
                                   if (previousStatus == "Completed") {
                                     _finishDate = null;
@@ -374,12 +372,8 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                   if (_totalEpisodes > 0) {
                                     _progress = _totalEpisodes;
                                   }
-                                  if (_startDate == null) {
-                                    _startDate = DateTime.now();
-                                  }
-                                  if (_finishDate == null) {
-                                    _finishDate = DateTime.now();
-                                  }
+                                  _startDate ??= DateTime.now();
+                                  _finishDate ??= DateTime.now();
                                 }
                               });
 
@@ -400,8 +394,8 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                 boxShadow: isSelected
                                     ? [
                                         BoxShadow(
-                                          color: AppTheme.primary.withOpacity(
-                                            0.3,
+                                          color: AppTheme.primary.withValues(
+                                            alpha: 0.3,
                                           ),
                                           blurRadius: 8,
                                           offset: const Offset(0, 4),
@@ -495,9 +489,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                         _totalEpisodes > 0) {
                                       _status = "Completed";
                                       // Auto-set finish date when reaching last episode
-                                      if (_finishDate == null) {
-                                        _finishDate = DateTime.now();
-                                      }
+                                      _finishDate ??= DateTime.now();
                                     } else if (_progress > 0) {
                                       _status = "Watching";
                                     }
@@ -768,7 +760,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.redAccent,
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: Colors.red.withOpacity(0.05),
+                          backgroundColor: Colors.red.withValues(alpha: 0.05),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

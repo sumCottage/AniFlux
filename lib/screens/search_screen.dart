@@ -429,11 +429,11 @@ class _SearchScreenState extends State<SearchScreen> {
         borderRadius: BorderRadius.circular(isFocused ? 30 : 24),
         boxShadow: [
           if (isFocused)
-            BoxShadow(
-              color: Colors.black.withOpacity(0.12),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
-            ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.12),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
         ],
       ),
       child: Row(
@@ -616,7 +616,7 @@ class _SearchScreenState extends State<SearchScreen> {
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 30,
               offset: const Offset(0, 10),
             ),
@@ -628,7 +628,7 @@ class _SearchScreenState extends State<SearchScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -984,7 +984,7 @@ class AnimeListCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -1014,35 +1014,33 @@ class AnimeListCard extends StatelessWidget {
                       const SizedBox(height: 8),
 
                       // Format + Year (Color Removed)
-                      Container(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              anime['format'] ?? "TV",
-                              style: TextStyle(
-                                color: Colors.grey.shade800,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            anime['format'] ?? "TV",
+                            style: TextStyle(
+                              color: Colors.grey.shade800,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                             ),
-                            const SizedBox(width: 6),
-                            Icon(
-                              Icons.circle,
-                              size: 4,
-                              color: Colors.grey.shade500,
+                          ),
+                          const SizedBox(width: 6),
+                          Icon(
+                            Icons.circle,
+                            size: 4,
+                            color: Colors.grey.shade500,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            year,
+                            style: TextStyle(
+                              color: Colors.grey.shade800,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              year,
-                              style: TextStyle(
-                                color: Colors.grey.shade800,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
 
                       const SizedBox(height: 8),
@@ -1072,7 +1070,7 @@ class AnimeListCard extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF714FDC).withOpacity(0.05),
+                              color: const Color(0xFF714FDC).withValues(alpha: 0.05),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -1080,7 +1078,7 @@ class AnimeListCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: const Color(0xFF714FDC).withOpacity(0.8),
+                                color: const Color(0xFF714FDC).withValues(alpha: 0.8),
                               ),
                             ),
                           ),
@@ -1099,7 +1097,7 @@ class AnimeListCard extends StatelessWidget {
               right: 12,
               child: Icon(
                 Icons.bookmark_rounded,
-                color: const Color(0xFF714FDC).withOpacity(0.25),
+                color: const Color(0xFF714FDC).withValues(alpha: 0.25),
                 size: 24,
               ),
             ),
@@ -1551,7 +1549,7 @@ class _CalendarViewState extends State<_CalendarView> {
                   gradient: LinearGradient(
                     begin: Alignment.center,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.9)],
+                    colors: [Colors.transparent, Colors.black.withValues(alpha: 0.9)],
                   ),
                 ),
               ),
@@ -1581,7 +1579,7 @@ class _CalendarViewState extends State<_CalendarView> {
                   Text(
                     "Ep $episode at ${_formatTime(airingAt)}",
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                     ),
@@ -1663,7 +1661,7 @@ class _RetryButtonState extends State<_RetryButton>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF714FDC).withOpacity(0.3),
+              color: const Color(0xFF714FDC).withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -1900,7 +1898,7 @@ class _SeasonalViewState extends State<_SeasonalView> {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.only(left: 4, right: 20),
                     itemCount: _seasons.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    separatorBuilder: (_, _) => const SizedBox(width: 8),
                     itemBuilder: (context, index) {
                       final season = _seasons[index];
                       final label = _seasonLabels[index];
@@ -1960,7 +1958,7 @@ class _SeasonalViewState extends State<_SeasonalView> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -2126,7 +2124,7 @@ class _SeasonalViewState extends State<_SeasonalView> {
                   gradient: LinearGradient(
                     begin: Alignment.center,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.9)],
+                    colors: [Colors.transparent, Colors.black.withValues(alpha: 0.9)],
                   ),
                 ),
               ),

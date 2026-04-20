@@ -150,8 +150,8 @@ class _AvatarPickerScreenState extends State<AvatarPickerScreen> {
                               boxShadow: [
                                 BoxShadow(
                                   color: isSelected
-                                      ? const Color(0xFF8A5CF6).withOpacity(0.4)
-                                      : Colors.black.withOpacity(0.1),
+                                      ? const Color(0xFF8A5CF6).withValues(alpha: 0.4)
+                                      : Colors.black.withValues(alpha: 0.1),
                                   blurRadius: isSelected ? 15 : 10,
                                   offset: const Offset(0, 5),
                                 ),

@@ -50,6 +50,7 @@ class AppUpdateService {
     if (latestVersion.isEmpty || latestVersion == '0.0.0') return;
 
     if (_isUpdateAvailable(currentVersion, latestVersion)) {
+      if (!context.mounted) return;
       _dialogShown = true;
       _showUpdateDialog(
         context,

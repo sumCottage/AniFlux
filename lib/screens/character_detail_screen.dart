@@ -4,6 +4,9 @@ import 'package:ainme_vault/screens/anime_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 
 class CharacterDetailScreen extends StatefulWidget {
@@ -30,6 +33,7 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen> {
   bool hasError = false;
   Map<String, dynamic>? character;
   bool isDescriptionExpanded = false;
+  bool showSpoilers = false;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   @override
@@ -84,15 +88,77 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen> {
     }
   }
 
+  Future<void> _handleLink(String href) async {
+    final uri = Uri.tryParse(href);
+    if (uri == null) return;
+
+    // Handle AniList internal links for Characters
+    final pathSegments = uri.pathSegments;
+    if (uri.host.contains('anilist.co') && pathSegments.length >= 2) {
+      final type = pathSegments[0]; // 'character'
+      final id = int.tryParse(pathSegments[1]);
+
+      if (id != null && type == 'character') {
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CharacterDetailScreen(characterId: id),
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final name =
         character?['name']?['full'] ?? widget.placeholderName ?? "Unknown";
     final nativeName = character?['name']?['native'];
     final image = character?['image']?['large'] ?? widget.placeholderImage;
-    final description =
-        character?['description']?.replaceAll(RegExp(r'<[^>]*>'), '') ??
-        "No description available.";
+    String rawDescription =
+        character?['description'] ?? "No description available.";
+    String height = "Unknown";
+
+    // Extract Height from description (looks for formats like __Height:__ 158 cm or Height: 158 cm)
+    final heightRegex = RegExp(
+      r'(?:__|\*\*)?Height:?(?:__|\*\*)?\s*([^\n\r]+)',
+      caseSensitive: false,
+    );
+    final heightMatch = heightRegex.firstMatch(rawDescription);
+    if (heightMatch != null) {
+      height = heightMatch.group(1)?.trim() ?? "Unknown";
+      // Remove the height line from description to avoid redundancy
+      rawDescription = rawDescription.replaceFirst(heightRegex, '').trim();
+    }
+
+    // Handle Spoilers: AniList uses ~! ... !~
+    // We wrap them in ~~ (strikethrough) which we will style as purple without a line
+    final spoilerRegex = RegExp(r'~!(.*?)!~', dotAll: true);
+    if (showSpoilers) {
+      // Show text in special color
+      rawDescription = rawDescription.replaceAllMapped(
+        spoilerRegex,
+        (match) => "~~${match.group(1) ?? ""}~~",
+      );
+    } else {
+      // Hide with placeholder in special color
+      rawDescription = rawDescription.replaceAll(
+        spoilerRegex,
+        "~~[Spoiler content hidden]~~",
+      );
+    }
+
+    // Process description: strip HTML but keep markdown structure
+    final description = rawDescription
+        .replaceAll(RegExp(r'<[^>]*>'), '')
+        .trim();
     final age = character?['age'] ?? "Unknown";
     final gender = character?['gender'] ?? "Unknown";
     final bloodType = character?['bloodType'] ?? "Unknown";
@@ -152,8 +218,8 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen> {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.2),
-                          Colors.black.withOpacity(0.8),
+                          Colors.black.withValues(alpha: 0.2),
+                          Colors.black.withValues(alpha: 0.8),
                         ],
                         stops: const [0.0, 0.6, 1.0],
                       ),
@@ -256,7 +322,7 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: Colors.black.withValues(alpha: 0.08),
                             blurRadius: 15,
                             offset: const Offset(0, 5),
                           ),
@@ -280,10 +346,10 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen> {
                                 Colors.blueAccent,
                               ),
                               _buildInfoItem(
-                                "Blood",
-                                bloodType,
-                                Icons.bloodtype_rounded,
-                                Colors.redAccent,
+                                "Height",
+                                height,
+                                Icons.height_rounded,
+                                Colors.greenAccent.shade700,
                               ),
                             ],
                           ),
@@ -301,6 +367,12 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen> {
                                 Colors.orangeAccent,
                               ),
                               _buildInfoItem(
+                                "Blood",
+                                bloodType,
+                                Icons.bloodtype_rounded,
+                                Colors.redAccent,
+                              ),
+                              _buildInfoItem(
                                 "Favourites",
                                 favourites,
                                 Icons.favorite_rounded,
@@ -314,66 +386,177 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen> {
 
                     const SizedBox(height: 30),
 
-                    // Description
-                    const Text(
-                      "About",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        const Text(
+                          "About",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const Spacer(),
+                        InkWell(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              showSpoilers = !showSpoilers;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: showSpoilers
+                                  ? AppTheme.primary.withValues(alpha: 0.1)
+                                  : Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: showSpoilers
+                                    ? AppTheme.primary.withValues(alpha: 0.3)
+                                    : Colors.grey.shade300,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  showSpoilers
+                                      ? Icons.visibility_rounded
+                                      : Icons.visibility_off_rounded,
+                                  size: 16,
+                                  color: showSpoilers
+                                      ? AppTheme.primary
+                                      : Colors.grey.shade600,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  showSpoilers
+                                      ? "Hide Spoilers"
+                                      : "Show Spoilers",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: showSpoilers
+                                        ? AppTheme.primary
+                                        : Colors.grey.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
-                    AnimatedCrossFade(
-                      firstChild: Text(
-                        description,
-                        maxLines: 6,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade700,
-                          height: 1.6,
-                        ),
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      secondChild: Text(
-                        description,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade700,
-                          height: 1.6,
-                        ),
+                      child: ClipRect(
+                        child: !isDescriptionExpanded
+                            ? SizedBox(
+                                height: 140,
+                                child: ShaderMask(
+                                  shaderCallback: (rect) {
+                                    return LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.black,
+                                        Colors.transparent,
+                                      ],
+                                      stops: const [0.7, 1.0],
+                                    ).createShader(rect);
+                                  },
+                                  blendMode: BlendMode.dstIn,
+                                  child: SingleChildScrollView(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    child: MarkdownBody(
+                                      data: description,
+                                      selectable: true,
+                                      softLineBreak: true,
+                                      styleSheet: MarkdownStyleSheet(
+                                        p: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.grey.shade700,
+                                          height: 1.6,
+                                        ),
+                                        del: TextStyle(
+                                          color: AppTheme.primary,
+                                          decoration: TextDecoration.none,
+                                          fontWeight: FontWeight.normal,
+                                          backgroundColor: AppTheme.primary
+                                              .withValues(alpha: 0.05),
+                                        ),
+                                      ),
+                                      onTapLink: (text, href, title) {
+                                        if (href != null) {
+                                          _handleLink(href);
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : MarkdownBody(
+                                data: description,
+                                selectable: true,
+                                softLineBreak: true,
+                                styleSheet: MarkdownStyleSheet(
+                                  p: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey.shade700,
+                                    height: 1.6,
+                                  ),
+                                  del: TextStyle(
+                                    color: AppTheme.primary,
+                                    decoration: TextDecoration.none,
+                                    fontWeight: FontWeight.normal,
+                                    backgroundColor: AppTheme.primary
+                                        .withValues(alpha: 0.05),
+                                  ),
+                                ),
+                                onTapLink: (text, href, title) {
+                                  if (href != null) {
+                                    _handleLink(href);
+                                  }
+                                },
+                              ),
                       ),
-                      crossFadeState: isDescriptionExpanded
-                          ? CrossFadeState.showSecond
-                          : CrossFadeState.showFirst,
-                      duration: const Duration(milliseconds: 300),
                     ),
+                    const SizedBox(height: 10),
                     GestureDetector(
                       onTap: () {
                         setState(() {
                           isDescriptionExpanded = !isDescriptionExpanded;
                         });
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              isDescriptionExpanded ? "Read Less" : "Read More",
-                              style: TextStyle(
-                                color: AppTheme.primary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ),
-                            Icon(
-                              isDescriptionExpanded
-                                  ? Icons.keyboard_arrow_up
-                                  : Icons.keyboard_arrow_down,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            isDescriptionExpanded ? "Read Less" : "Read More",
+                            style: TextStyle(
                               color: AppTheme.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
                             ),
-                          ],
-                        ),
+                          ),
+                          Icon(
+                            isDescriptionExpanded
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            color: AppTheme.primary,
+                          ),
+                        ],
                       ),
                     ),
 
@@ -479,32 +662,40 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen> {
     Color color,
   ) {
     return Expanded(
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 26),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            textAlign: TextAlign.center,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+      child: SizedBox(
+        height: 85, // Fixed height for consistent grid alignment
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 4),
+            Expanded(
+              child: Center(
+                child: Text(
+                  value,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                    height: 1.2,
+                  ),
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade500,
-              fontWeight: FontWeight.w500,
+            const SizedBox(height: 2),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.grey.shade500,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
