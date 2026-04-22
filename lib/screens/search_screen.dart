@@ -1,6 +1,6 @@
 //import 'package:ainme_vault/main.dart';
 //import 'package:ainme_vault/utils/transitions.dart';
-import 'package:ainme_vault/theme/app_theme.dart';
+//import 'package:ainme_vault/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/anilist_service.dart';
@@ -33,6 +33,20 @@ class SearchScreenState extends State<SearchScreen> {
     setState(() {
       isFocused = true;
     });
+  }
+
+  /// Called when the system back button is pressed while on the search tab.
+  /// Returns true if the search field was focused and got dismissed
+  /// (i.e. the back press was consumed), false otherwise.
+  bool unfocusSearchField() {
+    if (isFocused) {
+      _searchFocus.unfocus();
+      setState(() {
+        isFocused = false;
+      });
+      return true;
+    }
+    return false;
   }
 
   final TextEditingController _controller = TextEditingController();
@@ -1323,6 +1337,3 @@ class FadeInImageWidget extends StatelessWidget {
     );
   }
 }
-
-
-

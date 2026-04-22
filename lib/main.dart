@@ -61,6 +61,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   final GlobalKey<SearchScreenState> _searchScreenKey = GlobalKey<SearchScreenState>();
 
+  /// Tracks the last time the search tab was tapped while already active.
+  /// Used to detect a genuine double-tap (two taps within 300ms).
+  DateTime? _lastSearchTabTap;
+
   late final List<Widget> _screens = [
     const HomeScreen(key: PageStorageKey('home_key')),
     SearchScreen(key: _searchScreenKey),
@@ -94,6 +98,14 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   Future<bool> _handleBackPress() async {
+    // If on the search tab and the search field is focused,
+    // just dismiss the keyboard and stay on the search screen.
+    if (_currentIndex == 1) {
+      final consumed =
+          _searchScreenKey.currentState?.unfocusSearchField() ?? false;
+      if (consumed) return false;
+    }
+
     if (_currentIndex != 0) {
       if (mounted) {
         setState(() => _currentIndex = 0);
@@ -269,9 +281,22 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                             currentIndex: _currentIndex,
                             onTap: (idx) {
                               if (_currentIndex == 1) {
-                                // Already on search tab — focus the text field
-                                _searchScreenKey.currentState?.focusSearchField();
+                                // Already on search tab — check for genuine double-tap
+                                final now = DateTime.now();
+                                if (_lastSearchTabTap != null &&
+                                    now.difference(_lastSearchTabTap!) <
+                                        const Duration(milliseconds: 300)) {
+                                  // Genuine double-tap: focus the search field
+                                  _searchScreenKey.currentState
+                                      ?.focusSearchField();
+                                  _lastSearchTabTap = null; // Reset after triggering
+                                } else {
+                                  // First tap — record timestamp, don't focus yet
+                                  _lastSearchTabTap = now;
+                                }
                               } else {
+                                // Not on search tab — navigate to it
+                                _lastSearchTabTap = null; // Reset on fresh navigation
                                 setState(() => _currentIndex = idx);
                               }
                             },
