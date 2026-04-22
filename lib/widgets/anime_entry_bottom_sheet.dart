@@ -25,6 +25,9 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
   late bool _isNewEntry;
   bool get _episodesUnknown => widget.anime['episodes'] == null;
 
+  /// Whether the anime hasn't aired yet (status: NOT_YET_RELEASED).
+  bool get _isUpcoming => widget.anime['status'] == 'NOT_YET_RELEASED';
+
   bool _episodesLoading = true;
   bool _animeDetailsLoaded = false;
 
@@ -332,66 +335,74 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                   Row(
                     children: _statuses.map((status) {
                       final isSelected = _status == status;
+                      // Lock Watching & Completed for upcoming anime
+                      final isLocked = _isUpcoming &&
+                          (status == "Watching" || status == "Completed");
                       return Expanded(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4.0),
                           child: GestureDetector(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              final previousStatus = _status;
-                              setState(() {
-                                _status = status;
-                                _hasChanges = true;
+                            onTap: isLocked
+                                ? null
+                                : () {
+                                    HapticFeedback.lightImpact();
+                                    final previousStatus = _status;
+                                    setState(() {
+                                      _status = status;
+                                      _hasChanges = true;
 
-                                // Planning: Reset everything
-                                if (status == "Planning") {
-                                  _progress = 0;
-                                  _startDate = null;
-                                  _finishDate = null;
-                                }
+                                      // Planning: Reset everything
+                                      if (status == "Planning") {
+                                        _progress = 0;
+                                        _startDate = null;
+                                        _finishDate = null;
+                                      }
 
-                                // Watching: Set progress to 1 (if 0), set start date, clear finish date
-                                if (status == "Watching") {
-                                  // Coming from Completed: decrease by 1
-                                  if (previousStatus == "Completed" &&
-                                      _progress > 1) {
-                                    _progress = _progress - 1;
-                                  } else if (_progress == 0) {
-                                    // Coming from Planning: set to 1
-                                    _progress = 1;
-                                  }
-                                  _startDate ??= DateTime.now();
-                                  // Clear finish date when moving back from Completed
-                                  if (previousStatus == "Completed") {
-                                    _finishDate = null;
-                                  }
-                                }
+                                      // Watching: Set progress to 1 (if 0), set start date, clear finish date
+                                      if (status == "Watching") {
+                                        // Coming from Completed: decrease by 1
+                                        if (previousStatus == "Completed" &&
+                                            _progress > 1) {
+                                          _progress = _progress - 1;
+                                        } else if (_progress == 0) {
+                                          // Coming from Planning: set to 1
+                                          _progress = 1;
+                                        }
+                                        _startDate ??= DateTime.now();
+                                        // Clear finish date when moving back from Completed
+                                        if (previousStatus == "Completed") {
+                                          _finishDate = null;
+                                        }
+                                      }
 
-                                // Completed: Set max progress and both dates
-                                if (status == "Completed") {
-                                  if (_totalEpisodes > 0) {
-                                    _progress = _totalEpisodes;
-                                  }
-                                  _startDate ??= DateTime.now();
-                                  _finishDate ??= DateTime.now();
-                                }
-                              });
+                                      // Completed: Set max progress and both dates
+                                      if (status == "Completed") {
+                                        if (_totalEpisodes > 0) {
+                                          _progress = _totalEpisodes;
+                                        }
+                                        _startDate ??= DateTime.now();
+                                        _finishDate ??= DateTime.now();
+                                      }
+                                    });
 
-                              // Scroll to selected episode after status change
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                _scrollToSelectedEpisode();
-                              });
-                            },
+                                    // Scroll to selected episode after status change
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      _scrollToSelectedEpisode();
+                                    });
+                                  },
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppTheme.primary
-                                    : Colors.grey.shade100,
+                                color: isLocked
+                                    ? Colors.grey.shade200
+                                    : isSelected
+                                        ? AppTheme.primary
+                                        : Colors.grey.shade100,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: Colors.transparent),
-                                boxShadow: isSelected
+                                boxShadow: isSelected && !isLocked
                                     ? [
                                         BoxShadow(
                                           color: AppTheme.primary.withValues(
@@ -404,15 +415,31 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                     : [],
                               ),
                               alignment: Alignment.center,
-                              child: Text(
-                                status,
-                                style: TextStyle(
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors.grey.shade700,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (isLocked) ...[
+                                    Icon(
+                                      Icons.lock_rounded,
+                                      size: 14,
+                                      color: Colors.grey.shade400,
+                                    ),
+                                    const SizedBox(width: 4),
+                                  ],
+                                  Text(
+                                    status,
+                                    style: TextStyle(
+                                      color: isLocked
+                                          ? Colors.grey.shade400
+                                          : isSelected
+                                              ? Colors.white
+                                              : Colors.grey.shade700,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -455,78 +482,87 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                     ),
                   const SizedBox(height: 16),
 
-                  SizedBox(
-                    height: 50,
-                    child: _episodesLoading
-                        ? const Center(
-                            child: SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          )
-                        : ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: maxEps + 1,
-                            controller: _episodeScrollController,
-                            itemBuilder: (context, index) {
-                              final isSelected = index == _progress;
-                              return GestureDetector(
-                                onTap: () {
-                                  final previousProgress = _progress;
-                                  setState(() {
-                                    _progress = index;
-                                    _hasChanges = true;
-
-                                    // Auto-set start date when progress goes from 0 to 1+
-                                    if (previousProgress == 0 &&
-                                        index > 0 &&
-                                        _startDate == null) {
-                                      _startDate = DateTime.now();
-                                    }
-
-                                    if (_progress == _totalEpisodes &&
-                                        _totalEpisodes > 0) {
-                                      _status = "Completed";
-                                      // Auto-set finish date when reaching last episode
-                                      _finishDate ??= DateTime.now();
-                                    } else if (_progress > 0) {
-                                      _status = "Watching";
-                                    }
-                                  });
-                                },
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  width: 50,
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: isSelected
-                                        ? Border.all(
-                                            color: AppTheme.primary,
-                                            width: 2,
-                                          )
-                                        : null,
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "$index",
-                                    style: TextStyle(
-                                      fontSize: isSelected ? 20 : 16,
-                                      fontWeight: isSelected
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                      color: isSelected
-                                          ? AppTheme.primary
-                                          : Colors.grey.shade400,
-                                    ),
-                                  ),
+                  IgnorePointer(
+                    ignoring: _isUpcoming,
+                    child: Opacity(
+                      opacity: _isUpcoming ? 0.4 : 1.0,
+                      child: SizedBox(
+                        height: 50,
+                        child: _episodesLoading
+                            ? const Center(
+                                child: SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
                                 ),
-                              );
-                            },
-                          ),
+                              )
+                            : ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: maxEps + 1,
+                                controller: _episodeScrollController,
+                                itemBuilder: (context, index) {
+                                  final isSelected = index == _progress;
+                                  return GestureDetector(
+                                    onTap: () {
+                                      final previousProgress = _progress;
+                                      setState(() {
+                                        _progress = index;
+                                        _hasChanges = true;
+
+                                        // Auto-set start date when progress goes from 0 to 1+
+                                        if (previousProgress == 0 &&
+                                            index > 0 &&
+                                            _startDate == null) {
+                                          _startDate = DateTime.now();
+                                        }
+
+                                        if (_progress == _totalEpisodes &&
+                                            _totalEpisodes > 0) {
+                                          _status = "Completed";
+                                          // Auto-set finish date when reaching last episode
+                                          _finishDate ??= DateTime.now();
+                                        } else if (_progress > 0) {
+                                          _status = "Watching";
+                                        }
+                                      });
+                                    },
+                                    child: AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      width: 50,
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                        border: isSelected
+                                            ? Border.all(
+                                                color: AppTheme.primary,
+                                                width: 2,
+                                              )
+                                            : null,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "$index",
+                                        style: TextStyle(
+                                          fontSize: isSelected ? 20 : 16,
+                                          fontWeight: isSelected
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                          color: isSelected
+                                              ? AppTheme.primary
+                                              : Colors.grey.shade400,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+                    ),
                   ),
 
                   const SizedBox(height: 20),
@@ -583,25 +619,41 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
 
                   const SizedBox(height: 20),
 
-                  // 5. Date Selectors
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildDateSelector(
-                          "Start Date",
-                          _startDate,
-                          (date) => setState(() => _startDate = date),
-                        ),
+                  // 5. Date Selectors (locked for upcoming anime)
+                  IgnorePointer(
+                    ignoring: _isUpcoming,
+                    child: Opacity(
+                      opacity: _isUpcoming ? 0.4 : 1.0,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _buildDateSelector(
+                              "Start Date",
+                              _startDate,
+                              onSelect: (date) =>
+                                  setState(() => _startDate = date),
+                              onClear: () => setState(() {
+                                _startDate = null;
+                                _hasChanges = true;
+                              }),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildDateSelector(
+                              "Finish Date",
+                              _finishDate,
+                              onSelect: (date) =>
+                                  setState(() => _finishDate = date),
+                              onClear: () => setState(() {
+                                _finishDate = null;
+                                _hasChanges = true;
+                              }),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildDateSelector(
-                          "Finish Date",
-                          _finishDate,
-                          (date) => setState(() => _finishDate = date),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
 
                   const SizedBox(height: 30),
@@ -802,16 +854,39 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
 
   Widget _buildDateSelector(
     String label,
-    DateTime? date,
-    Function(DateTime) onSelect,
-  ) {
+    DateTime? date, {
+    required Function(DateTime) onSelect,
+    VoidCallback? onClear,
+  }) {
     return GestureDetector(
       onTap: () async {
+        // Cross-validate: Finish Date can't be before Start Date,
+        // and Start Date can't be after Finish Date.
+        final DateTime earliest;
+        final DateTime latest;
+        if (label == "Finish Date" && _startDate != null) {
+          earliest = _startDate!;
+        } else {
+          earliest = DateTime(2000);
+        }
+        if (label == "Start Date" && _finishDate != null) {
+          latest = _finishDate!;
+        } else {
+          latest = DateTime.now();
+        }
+        // Clamp initialDate to stay within the valid range
+        final initial = date ?? DateTime.now();
+        final clampedInitial = initial.isBefore(earliest)
+            ? earliest
+            : initial.isAfter(latest)
+                ? latest
+                : initial;
+
         final picked = await showDatePicker(
           context: context,
-          initialDate: date ?? DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime.now(),
+          initialDate: clampedInitial,
+          firstDate: earliest,
+          lastDate: latest,
           builder: (context, child) {
             return Theme(
               data: Theme.of(context).copyWith(
@@ -854,7 +929,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
           ),
           const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
             decoration: BoxDecoration(
               color: Colors.grey.shade50,
               borderRadius: BorderRadius.circular(12),
@@ -867,11 +942,11 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                   size: 18,
                   color: date != null ? AppTheme.primary : Colors.grey.shade600,
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     date != null
-                        ? DateFormat('MMM dd, yyyy').format(date)
+                        ? DateFormat('dd MMM, yy').format(date)
                         : "Select Date",
                     style: TextStyle(
                       color: date != null
@@ -883,6 +958,15 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                     ),
                   ),
                 ),
+                if (date != null && onClear != null)
+                  GestureDetector(
+                    onTap: onClear,
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 18,
+                      color: Colors.grey.shade400,
+                    ),
+                  ),
               ],
             ),
           ),
