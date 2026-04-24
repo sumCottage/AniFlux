@@ -274,9 +274,9 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),
@@ -292,7 +292,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
-                  color: Colors.grey,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
                 Text(
                   "Edit Entry",
@@ -315,7 +315,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: canSave ? AppTheme.primary : Colors.grey,
+                      color: canSave ? AppTheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                     ),
                   ),
                 ),
@@ -396,10 +396,10 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               decoration: BoxDecoration(
                                 color: isLocked
-                                    ? Colors.grey.shade200
+                                    ? Theme.of(context).colorScheme.surfaceContainerHighest
                                     : isSelected
                                         ? AppTheme.primary
-                                        : Colors.grey.shade100,
+                                        : Theme.of(context).colorScheme.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: Colors.transparent),
                                 boxShadow: isSelected && !isLocked
@@ -423,7 +423,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                     Icon(
                                       Icons.lock_rounded,
                                       size: 14,
-                                      color: Colors.grey.shade400,
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                                     ),
                                     const SizedBox(width: 4),
                                   ],
@@ -434,7 +434,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                           ? Colors.grey.shade400
                                           : isSelected
                                               ? Colors.white
-                                              : Colors.grey.shade700,
+                                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     ),
@@ -463,7 +463,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                           : Text(
                               "$_progress / $_totalEpisodes",
                               style: TextStyle(
-                                color: Colors.grey.shade600,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -476,7 +476,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                         "Episode count unknown",
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade500,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
                         ),
                       ),
                     ),
@@ -554,7 +554,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                               : FontWeight.normal,
                                           color: isSelected
                                               ? AppTheme.primary
-                                              : Colors.grey.shade400,
+                                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                                         ),
                                       ),
                                     ),
@@ -578,10 +578,14 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.amber.shade50,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.amber.shade900.withValues(alpha: 0.3)
+                              : Colors.amber.shade50,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: Colors.amber.shade200,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.amber.shade700.withValues(alpha: 0.4)
+                                : Colors.amber.shade200,
                             width: 1.5,
                           ),
                         ),
@@ -612,7 +616,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                     "This is the official rating from AniList",
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade500,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -680,7 +684,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                     Container(
                                       padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
-                                        color: Colors.red.shade50,
+                                        color: Colors.red.shade50.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.15 : 1.0),
                                         shape: BoxShape.circle,
                                       ),
                                       child: Icon(
@@ -697,7 +701,6 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
                                       ),
                                     ),
                                     const SizedBox(height: 12),
@@ -708,7 +711,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: Colors.grey.shade600,
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                         height: 1.4,
                                       ),
                                     ),
@@ -728,7 +731,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                                     vertical: 14,
                                                   ),
                                               side: BorderSide(
-                                                color: Colors.grey.shade300,
+                                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                                               ),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
@@ -740,7 +743,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w600,
-                                                color: Colors.grey.shade700,
+                                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                               ),
                                             ),
                                           ),
@@ -846,7 +849,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
       style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.bold,
-        color: Colors.grey.shade600,
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         letterSpacing: 0.5,
       ),
     );
@@ -890,12 +893,19 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
           builder: (context, child) {
             return Theme(
               data: Theme.of(context).copyWith(
-                colorScheme: ColorScheme.light(
-                  primary: AppTheme.primary,
-                  onPrimary: Colors.white,
-                  surface: Colors.white,
-                  onSurface: Colors.black,
-                ),
+                colorScheme: Theme.of(context).brightness == Brightness.dark
+                    ? ColorScheme.dark(
+                        primary: AppTheme.primary,
+                        onPrimary: Colors.white,
+                        surface: Theme.of(context).colorScheme.surface,
+                        onSurface: Theme.of(context).colorScheme.onSurface,
+                      )
+                    : ColorScheme.light(
+                        primary: AppTheme.primary,
+                        onPrimary: Colors.white,
+                        surface: Colors.white,
+                        onSurface: Colors.black,
+                      ),
               ),
               child: child!,
             );
@@ -925,22 +935,22 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
         children: [
           Text(
             label,
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13),
           ),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.calendar_today_rounded,
                   size: 18,
-                  color: date != null ? AppTheme.primary : Colors.grey.shade600,
+                  color: date != null ? AppTheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -950,8 +960,8 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                         : "Select Date",
                     style: TextStyle(
                       color: date != null
-                          ? Colors.black87
-                          : Colors.grey.shade500,
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
                       fontWeight: date != null
                           ? FontWeight.w600
                           : FontWeight.normal,
@@ -964,7 +974,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
                     child: Icon(
                       Icons.close_rounded,
                       size: 18,
-                      color: Colors.grey.shade400,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                     ),
                   ),
               ],

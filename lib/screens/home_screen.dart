@@ -21,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // ---------------- STATE VARIABLES ----------------
-  final PageController _pageController = PageController();
+  final PageController _pageController = PageController(initialPage: 5000);
   List<dynamic> _airingAnimeList = [];
   bool _isLoading = true;
   bool _isDark(Color c) => c.computeLuminance() < 0.5;
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _bgColorNotifier = ValueNotifier(const Color(0xFFF5F4FA));
+    _bgColorNotifier = ValueNotifier(AppTheme.primary);
     _pageIndexNotifier = ValueNotifier(0);
     _carouselRetryCountdown = ValueNotifier(0);
 
@@ -190,6 +190,12 @@ class _HomeScreenState extends State<HomeScreen> {
           if (_airingAnimeList.isNotEmpty) {
             _bgColorNotifier.value = _getProcessedColor(0);
             _pageIndexNotifier.value = 0;
+            // Reset page controller to middle for infinite scrolling
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (_pageController.hasClients) {
+                _pageController.jumpToPage(5000);
+              }
+            });
             _startAutoScroll();
           }
         });
@@ -229,11 +235,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _timer = Timer.periodic(const Duration(seconds: 5), (_) {
       if (!_pageController.hasClients || _airingAnimeList.isEmpty) return;
 
-      final current = _pageIndexNotifier.value;
-      final next = (current + 1) % _airingAnimeList.length;
+      final currentPage = _pageController.page?.round() ?? 0;
 
       _pageController.animateToPage(
-        next,
+        currentPage + 1,
         duration: const Duration(milliseconds: 800),
         curve: Curves.easeInOut,
       );
@@ -341,14 +346,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                   },
                                   child: PageView.builder(
                                     controller: _pageController,
-                                    itemCount: _airingAnimeList.length,
+                                    itemCount: _airingAnimeList.length * 10000,
                                     onPageChanged: (index) {
-                                      _pageIndexNotifier.value = index;
+                                      final realIndex = index % _airingAnimeList.length;
+                                      _pageIndexNotifier.value = realIndex;
                                       _bgColorNotifier.value =
-                                          _getProcessedColor(index);
+                                          _getProcessedColor(realIndex);
                                     },
                                     itemBuilder: (context, index) {
-                                      final anime = _airingAnimeList[index];
+                                      final realIndex = index % _airingAnimeList.length;
+                                      final anime = _airingAnimeList[realIndex];
                                       return _AnimeCard(anime: anime);
                                     },
                                   ),
@@ -772,6 +779,37 @@ class MyAnimeList extends StatefulWidget {
 class _MyAnimeListState extends State<MyAnimeList> {
   List<QueryDocumentSnapshot>? _cachedSortedList;
   String? _lastSortKey;
+  Stream<QuerySnapshot>? _stream;
+
+  @override
+  void initState() {
+    super.initState();
+    _initStream();
+  }
+
+  @override
+  void didUpdateWidget(covariant MyAnimeList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.status != widget.status) {
+      _initStream();
+      _cachedSortedList = null;
+      _lastSortKey = null;
+    }
+  }
+
+  void _initStream() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _stream = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('anime')
+          .where('status', isEqualTo: widget.status)
+          .snapshots();
+    } else {
+      _stream = null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -802,14 +840,10 @@ class _MyAnimeListState extends State<MyAnimeList> {
     }
 
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('anime')
-          .where('status', isEqualTo: widget.status)
-          .snapshots(),
+      stream: _stream,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            !snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -1203,15 +1237,7 @@ class _MyAnimeListState extends State<MyAnimeList> {
     );
   }
 
-  @override
-  void didUpdateWidget(covariant MyAnimeList oldWidget) {
-    super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.status != widget.status) {
-      _cachedSortedList = null;
-      _lastSortKey = null;
-    }
-  }
 
   List<QueryDocumentSnapshot> _sortAnimeList(
     List<QueryDocumentSnapshot> docs,
@@ -1444,7 +1470,9 @@ class _StatusChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppTheme.primary
-              : Theme.of(context).colorScheme.surfaceContainerHighest,
+              : Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey.shade800
+                  : Colors.grey.shade300,
           borderRadius: BorderRadius.circular(24),
         ),
         child: Text(
@@ -1469,9 +1497,13 @@ class _AnimeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coverImage = anime['coverImage']?['large'] ?? "";
+    final bannerImage = anime['bannerImage'] ?? anime['coverImage']?['large'] ?? "";
     final title = anime['title']?['english'] ?? anime['title']?['romaji'] ?? "";
     final score = ((anime['averageScore'] ?? 0) as num) / 10;
+
+    final status = anime['status'] ?? "";
+    final isAiring = status == 'RELEASING';
+    final isUpcoming = status == 'NOT_YET_RELEASED';
 
     return GestureDetector(
       onTap: () {
@@ -1500,7 +1532,7 @@ class _AnimeCard extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               CachedNetworkImage(
-                imageUrl: coverImage,
+                imageUrl: bannerImage,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Container(
                   color: Colors.grey[300],
@@ -1549,45 +1581,70 @@ class _AnimeCard extends StatelessWidget {
                     color: Colors.black.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: score > 0
-                      ? Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              color: Colors.amber,
-                              size: 16,
+                  child: () {
+                    if (isUpcoming) {
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.upcoming_rounded,
+                            color: Colors.lightBlueAccent,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          const Text(
+                            "Upcoming",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              score.toStringAsFixed(1),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          ),
+                        ],
+                      );
+                    } else if (isAiring) {
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.sensors_rounded,
+                            color: Colors.greenAccent,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          const Text(
+                            "Airing",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
-                        )
-                      : Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.upcoming_rounded,
-                              color: Colors.lightBlueAccent,
-                              size: 16,
+                          ),
+                        ],
+                      );
+                    } else if (score > 0) {
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.star_rounded,
+                            color: Colors.amber,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            score.toStringAsFixed(1),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(width: 4),
-                            const Text(
-                              "Upcoming",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }(),
                 ),
               ),
             ],

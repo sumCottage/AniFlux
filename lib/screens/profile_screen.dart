@@ -445,19 +445,24 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              Transform.scale(
-                scale: 0.85,
-                child: Switch(
-                  value: isDark,
-                  onChanged: (value) {
-                    ThemeProvider.instance.setThemeMode(
-                      value ? ThemeMode.dark : ThemeMode.light,
-                    );
-                  },
-                  activeThumbColor: AppTheme.primary,
-                  activeTrackColor: AppTheme.primary.withValues(alpha: 0.3),
-                  inactiveThumbColor: Colors.grey.shade400,
-                  inactiveTrackColor: Colors.grey.shade300,
+              SizedBox(
+                width: 45,
+                child: Transform.scale(
+                  scale: 0.8,
+                  child: Switch(
+                    value: isDark,
+                    onChanged: (value) {
+                      ThemeProvider.instance.setThemeMode(
+                        value ? ThemeMode.dark : ThemeMode.light,
+                      );
+                    },
+                    activeThumbColor: AppTheme.primary,
+                    activeTrackColor: AppTheme.primary.withValues(alpha: 0.3),
+                    inactiveThumbColor: Colors.white,
+                    inactiveTrackColor: Colors.grey.shade300,
+                    trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
                 ),
               ),
             ],

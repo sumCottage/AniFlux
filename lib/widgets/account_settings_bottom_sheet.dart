@@ -73,7 +73,9 @@ class _AccountSettingsBottomSheetState
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -88,7 +90,9 @@ class _AccountSettingsBottomSheetState
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                   const Expanded(
                     child: Text(
@@ -156,7 +160,9 @@ class _AccountSettingsBottomSheetState
                                       Container(
                                         padding: const EdgeInsets.all(6),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withValues(alpha: 0.2),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.2,
+                                          ),
                                           shape: BoxShape.circle,
                                         ),
                                         child: const Icon(
@@ -299,7 +305,9 @@ class _AccountSettingsBottomSheetState
             Icon(
               Icons.arrow_forward_ios,
               size: 16,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.25),
             ),
           ],
         ),
@@ -452,7 +460,9 @@ class _AccountSettingsBottomSheetState
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.4,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
 
@@ -464,14 +474,23 @@ class _AccountSettingsBottomSheetState
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3), width: 1),
+                        side: BorderSide(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
                       child: Text(
                         "Cancel",
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
                       ),
                     ),
                   ),
