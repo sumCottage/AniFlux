@@ -147,10 +147,16 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_airingAnimeList.isNotEmpty && !_isLoading && !retry) return;
 
     try {
-      // SEQUENTIAL FETCHING to avoid burst rate limits
-      final airingData = await AniListService.getAiringAnime();
-      final popularData = await AniListService.getPopularAnime();
-      final upcomingData = await AniListService.getUpcomingAnime();
+      // PARALLEL FETCHING for significantly faster load times
+      final results = await Future.wait([
+        AniListService.getAiringAnime(pages: 1),
+        AniListService.getPopularAnime(pages: 1),
+        AniListService.getUpcomingAnime(pages: 1),
+      ]);
+
+      final airingData = results[0];
+      final popularData = results[1];
+      final upcomingData = results[2];
 
       if (!mounted) return;
 
@@ -263,8 +269,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ValueListenableBuilder<Color>(
                   valueListenable: _bgColorNotifier,
                   builder: (_, color, child) {
-                    final scaffoldBg =
-                        Theme.of(context).scaffoldBackgroundColor;
+                    final scaffoldBg = Theme.of(
+                      context,
+                    ).scaffoldBackgroundColor;
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 600),
                       curve: Curves.easeOutCubic,
@@ -348,13 +355,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     controller: _pageController,
                                     itemCount: _airingAnimeList.length * 10000,
                                     onPageChanged: (index) {
-                                      final realIndex = index % _airingAnimeList.length;
+                                      final realIndex =
+                                          index % _airingAnimeList.length;
                                       _pageIndexNotifier.value = realIndex;
                                       _bgColorNotifier.value =
                                           _getProcessedColor(realIndex);
                                     },
                                     itemBuilder: (context, index) {
-                                      final realIndex = index % _airingAnimeList.length;
+                                      final realIndex =
+                                          index % _airingAnimeList.length;
                                       final anime = _airingAnimeList[realIndex];
                                       return _AnimeCard(anime: anime);
                                     },
@@ -448,7 +457,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             20,
                                           ),
                                         ),
-                                        color: Theme.of(context).colorScheme.surface,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.surface,
                                         elevation: 12,
                                         onSelected: (value) {
                                           setState(() {
@@ -578,7 +589,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? AppTheme.primary : Theme.of(context).colorScheme.onSurface,
+                  color: isSelected
+                      ? AppTheme.primary
+                      : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -826,7 +839,7 @@ class _MyAnimeListState extends State<MyAnimeList> {
               const Icon(Icons.lock_outline, size: 48, color: Colors.grey),
               const SizedBox(height: 16),
               const Text(
-                "Login to track your anime",
+                "Login to track your anime journey",
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 16,
@@ -953,6 +966,8 @@ class _MyAnimeListState extends State<MyAnimeList> {
                 'coverImage': {'large': data['coverImage']},
                 'averageScore': data['averageScore'],
                 'episodes': data['totalEpisodes'],
+                'status':
+                    data['releaseStatus'], // 🔥 Pass AniList release status
               };
 
               return GestureDetector(
@@ -1054,6 +1069,7 @@ class _MyAnimeListState extends State<MyAnimeList> {
               'coverImage': {'large': data['coverImage']},
               'averageScore': data['averageScore'],
               'episodes': data['totalEpisodes'],
+              'status': data['releaseStatus'], // 🔥 Pass AniList release status
             };
 
             return AnimatedSwitcher(
@@ -1171,7 +1187,9 @@ class _MyAnimeListState extends State<MyAnimeList> {
                                           ? 0
                                           : progress / totalEpisodes,
                                       minHeight: 3,
-                                      backgroundColor: Theme.of(context).brightness == Brightness.dark
+                                      backgroundColor:
+                                          Theme.of(context).brightness ==
+                                              Brightness.dark
                                           ? Colors.grey.shade800
                                           : Colors.grey.shade200,
                                       valueColor: AlwaysStoppedAnimation(
@@ -1206,14 +1224,21 @@ class _MyAnimeListState extends State<MyAnimeList> {
                                   )
                                 : IconButton(
                                     key: const ValueKey('add'),
-                                    icon: const Icon(
-                                      Icons.add_circle_outline_rounded,
+                                    icon: Icon(
+                                      data['releaseStatus'] ==
+                                              'NOT_YET_RELEASED'
+                                          ? Icons.upcoming_rounded
+                                          : Icons.add_circle_outline_rounded,
                                       size: 28,
                                     ),
                                     padding: EdgeInsets.zero, // 🔥 important
                                     constraints:
                                         const BoxConstraints(), // 🔥 important
-                                    color: AppTheme.primary,
+                                    color:
+                                        data['releaseStatus'] ==
+                                            'NOT_YET_RELEASED'
+                                        ? Colors.grey.shade400
+                                        : AppTheme.primary,
                                     onPressed: () {
                                       HapticFeedback.lightImpact();
                                       _onAddEpisode(
@@ -1236,8 +1261,6 @@ class _MyAnimeListState extends State<MyAnimeList> {
       },
     );
   }
-
-
 
   List<QueryDocumentSnapshot> _sortAnimeList(
     List<QueryDocumentSnapshot> docs,
@@ -1313,6 +1336,49 @@ Future<void> _onAddEpisode({
   final int currentWatchMinutes = data['watchMinutes'] ?? 0;
 
   if (totalEpisodes != 0 && progress >= totalEpisodes) return;
+
+  // 🔥 Block increment for upcoming anime
+  if (data['releaseStatus'] == 'NOT_YET_RELEASED') {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.info_outline_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                "This anime hasn't been released yet!",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppTheme.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        elevation: 8,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+    return;
+  }
 
   final Map<String, dynamic> updateData = {};
 
@@ -1471,8 +1537,8 @@ class _StatusChip extends StatelessWidget {
           color: isSelected
               ? AppTheme.primary
               : Theme.of(context).brightness == Brightness.dark
-                  ? Colors.grey.shade800
-                  : Colors.grey.shade300,
+              ? Colors.grey.shade800
+              : Colors.grey.shade300,
           borderRadius: BorderRadius.circular(24),
         ),
         child: Text(
@@ -1497,7 +1563,8 @@ class _AnimeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bannerImage = anime['bannerImage'] ?? anime['coverImage']?['large'] ?? "";
+    final bannerImage =
+        anime['bannerImage'] ?? anime['coverImage']?['large'] ?? "";
     final title = anime['title']?['english'] ?? anime['title']?['romaji'] ?? "";
     final score = ((anime['averageScore'] ?? 0) as num) / 10;
 
@@ -1534,6 +1601,10 @@ class _AnimeCard extends StatelessWidget {
               CachedNetworkImage(
                 imageUrl: bannerImage,
                 fit: BoxFit.cover,
+                fadeInDuration: const Duration(milliseconds: 300),
+                fadeOutDuration: const Duration(milliseconds: 300),
+                // Optimization: limit image cache size for carousel to save memory/time
+                memCacheHeight: 400,
                 placeholder: (context, url) => Container(
                   color: Colors.grey[300],
                   child: const Center(child: CircularProgressIndicator()),

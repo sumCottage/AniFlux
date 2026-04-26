@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +16,12 @@ class ThemeProvider extends ValueNotifier<ThemeMode> {
 
   /// Loads the persisted theme mode from SharedPreferences.
   Future<void> _loadFromPrefs() async {
+    // 🔥 If no user is logged in, always default to light mode
+    if (FirebaseAuth.instance.currentUser == null) {
+      value = ThemeMode.light;
+      return;
+    }
+
     final prefs = await SharedPreferences.getInstance();
     final stored = prefs.getString(_key);
     if (stored != null) {
@@ -30,6 +37,11 @@ class ThemeProvider extends ValueNotifier<ThemeMode> {
     value = mode;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_key, mode.name);
+  }
+
+  /// Resets the theme to light mode (used on logout).
+  Future<void> resetToDefault() async {
+    await setThemeMode(ThemeMode.light);
   }
 
   /// Whether the app is currently in dark mode (resolved against platform).

@@ -1,4 +1,5 @@
 import 'package:ainme_vault/main.dart';
+import 'package:ainme_vault/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -558,6 +559,7 @@ class _AccountSettingsBottomSheetState
       }
 
       // ✅ 5. Firebase sign out
+      await ThemeProvider.instance.resetToDefault();
       await FirebaseAuth.instance.signOut();
 
       if (!context.mounted) return;

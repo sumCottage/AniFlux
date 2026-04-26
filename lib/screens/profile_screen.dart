@@ -602,6 +602,9 @@ class ProfileScreen extends StatelessWidget {
                 await googleSignIn.signOut();
               }
 
+              // Revert theme to light mode for guests
+              await ThemeProvider.instance.resetToDefault();
+
               // Sign out from Firebase
               await auth.signOut();
 

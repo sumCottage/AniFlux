@@ -138,6 +138,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
 
         // 🔥 Hydrate missing fields
         widget.anime['format'] = fullAnime['format'];
+        widget.anime['status'] = fullAnime['status']; // 🔥 Hydrate status
         widget.anime['seasonYear'] =
             fullAnime['seasonYear'] ?? fullAnime['startDate']?['year'];
         widget.anime['duration'] =
@@ -214,6 +215,7 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
         'lastUpdated': FieldValue.serverTimestamp(),
         'format': format, // TV, MOVIE, ONA
         'seasonYear': widget.anime['seasonYear'], // 2019
+        'releaseStatus': widget.anime['status'], // 🔥 Store AniList status (RELEASING, NOT_YET_RELEASED, etc.)
         'episodeDuration':
             episodeDuration, // 🔥 For accurate watch time tracking
         'watchMinutes':
@@ -246,17 +248,39 @@ class _AnimeEntryBottomSheetState extends State<AnimeEntryBottomSheet> {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
+        content: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.error_outline_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
         backgroundColor: Colors.redAccent,
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+        elevation: 8,
         duration: const Duration(seconds: 3),
       ),
     );
